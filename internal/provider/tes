@@ -1,8 +1,0 @@
-	state.Model = server.Model.ValueInt64()
-	state.Memory = server.Memory.ValueInt64()
-	state.CPUSpeed = server.CPUSpeed.ValueInt64()
-	state.Disk = server.Disk.ValueInt64()
-	state.SSHKey = server.SSHKey.ValueString()
-	state.OSImage = server.OSImage.ValueString()
-	state.WaitForDNS = server.WaitForDNS.ValueBool()
-

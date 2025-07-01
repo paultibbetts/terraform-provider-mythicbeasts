@@ -160,6 +160,10 @@ func (p *mythicbeastsProvider) DataSources(_ context.Context) []func() datasourc
 	return []func() datasource.DataSource{
 		NewPiModelsDataSource,
 		NewPiOperatingSystemsDataSource,
+		NewVPSDiskSizesDataSource,
+		NewVPSImagesDataSource,
+		NewVPSProductsDataSource,
+		NewVPSZonesDataSource,
 	}
 }
 
@@ -167,5 +171,6 @@ func (p *mythicbeastsProvider) DataSources(_ context.Context) []func() datasourc
 func (p *mythicbeastsProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewPiResource,
+		NewVPSResource,
 	}
 }
