@@ -161,6 +161,7 @@ func (p *mythicbeastsProvider) DataSources(_ context.Context) []func() datasourc
 		NewPiModelsDataSource,
 		NewPiOperatingSystemsDataSource,
 		NewVPSDiskSizesDataSource,
+		NewVPSHostsDataSource,
 		NewVPSImagesDataSource,
 		NewVPSPricingDataSource,
 		NewVPSProductsDataSource,
