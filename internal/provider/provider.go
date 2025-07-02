@@ -173,6 +173,7 @@ func (p *mythicbeastsProvider) DataSources(_ context.Context) []func() datasourc
 func (p *mythicbeastsProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewPiResource,
+		NewUserDataResource,
 		NewVPSResource,
 	}
 }
