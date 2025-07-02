@@ -23,23 +23,23 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource                = &piServerResource{}
-	_ resource.ResourceWithConfigure   = &piServerResource{}
-	_ resource.ResourceWithImportState = &piServerResource{}
+	_ resource.Resource                = &PiResource{}
+	_ resource.ResourceWithConfigure   = &PiResource{}
+	_ resource.ResourceWithImportState = &PiResource{}
 )
 
 // NewPiResource is a helper function to simplify the provider implementation.
 func NewPiResource() resource.Resource {
-	return &piServerResource{}
+	return &PiResource{}
 }
 
-// piServerResource is the resource implementation.
-type piServerResource struct {
+// PiResource is the resource implementation.
+type PiResource struct {
 	client *mythicbeasts.Client
 }
 
-// piServerResourceModel maps the resource schema data.
-type piServerResourceModel struct {
+// PiResourceModel maps the resource schema data.
+type PiResourceModel struct {
 	Identifier types.String `tfsdk:"identifier"`
 	DiskSize   types.Int64  `tfsdk:"disk_size"`
 	SSHKey     types.String `tfsdk:"ssh_key"`
@@ -55,12 +55,12 @@ type piServerResourceModel struct {
 }
 
 // Metadata returns the resource type name.
-func (r *piServerResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_pi_server"
+func (r *PiResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_Pi"
 }
 
 // Schema defines the schema for the resource.
-func (r *piServerResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"identifier": schema.StringAttribute{
@@ -145,7 +145,7 @@ func (r *piServerResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 }
 
 // Configure adds the provider configured client to the resource.
-func (r *piServerResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *PiResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Add a nil check when handling ProviderData because Terraform
 	// sets that data after it calls the ConfigureProvider RPC.
 	if req.ProviderData == nil {
@@ -157,7 +157,7 @@ func (r *piServerResource) Configure(_ context.Context, req resource.ConfigureRe
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Data Source Configure Type",
-			fmt.Sprintf("Expected *mythicbeasts.Client, got: %T. piServer report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *mythicbeasts.Client, got: %T. Pi report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -167,62 +167,62 @@ func (r *piServerResource) Configure(_ context.Context, req resource.ConfigureRe
 }
 
 // Create creates the resource and sets the initial Terraform state.
-func (r *piServerResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan piServerResourceModel
+	var plan PiResourceModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var piServer mythicbeasts.CreatePiServerRequest
+	var Pi mythicbeasts.CreatePiRequest
 
 	identifier := plan.Identifier.ValueString()
 
 	if !plan.Model.IsNull() && !plan.Model.IsUnknown() {
-		piServer.Model = plan.Model.ValueInt64()
+		Pi.Model = plan.Model.ValueInt64()
 	}
 
 	if !plan.Memory.IsNull() && !plan.Memory.IsUnknown() {
-		piServer.Memory = plan.Memory.ValueInt64()
+		Pi.Memory = plan.Memory.ValueInt64()
 	}
 
 	if !plan.CPUSpeed.IsNull() && !plan.CPUSpeed.IsUnknown() {
-		piServer.CPUSpeed = plan.CPUSpeed.ValueInt64()
+		Pi.CPUSpeed = plan.CPUSpeed.ValueInt64()
 	}
 
 	if !plan.DiskSize.IsNull() && !plan.DiskSize.IsUnknown() {
-		piServer.DiskSize = plan.DiskSize.ValueInt64()
+		Pi.DiskSize = plan.DiskSize.ValueInt64()
 	}
 
 	if !plan.SSHKey.IsNull() && !plan.SSHKey.IsUnknown() {
-		piServer.SSHKey = plan.SSHKey.ValueString()
+		Pi.SSHKey = plan.SSHKey.ValueString()
 	}
 
 	if !plan.OSImage.IsNull() && !plan.OSImage.IsUnknown() {
-		piServer.OSImage = plan.OSImage.ValueString()
+		Pi.OSImage = plan.OSImage.ValueString()
 	}
 
 	if !plan.WaitForDNS.IsNull() && !plan.WaitForDNS.IsUnknown() {
-		piServer.WaitForDNS = plan.WaitForDNS.ValueBool()
+		Pi.WaitForDNS = plan.WaitForDNS.ValueBool()
 	}
 
-	piServerJSON, err := json.Marshal(piServer)
+	PiJSON, err := json.Marshal(Pi)
 	if err != nil {
-		tflog.Warn(ctx, "Failed to marshal PiServer for logging", map[string]interface{}{"error": err.Error()})
+		tflog.Warn(ctx, "Failed to marshal Pi for logging", map[string]interface{}{"error": err.Error()})
 	} else {
-		var piServerMap map[string]interface{}
-		err = json.Unmarshal(piServerJSON, &piServerMap)
+		var PiMap map[string]interface{}
+		err = json.Unmarshal(PiJSON, &PiMap)
 		if err != nil {
-			tflog.Warn(ctx, "Failed to unmarshal PiServer JSON for logging", map[string]interface{}{"error": err.Error()})
+			tflog.Warn(ctx, "Failed to unmarshal Pi JSON for logging", map[string]interface{}{"error": err.Error()})
 		} else {
-			tflog.Info(ctx, "Creating PiServer with the following config", piServerMap)
+			tflog.Info(ctx, "Creating Pi with the following config", PiMap)
 		}
 	}
 
 	// Create new server
-	server, err := r.client.CreatePiServer(identifier, piServer)
+	server, err := r.client.CreatePi(identifier, Pi)
 	if err != nil {
 		var identifierConflictErr *mythicbeasts.ErrIdentifierConflict
 		if errors.As(err, &identifierConflictErr) {
@@ -253,11 +253,6 @@ func (r *piServerResource) Create(ctx context.Context, req resource.CreateReques
 
 	state := plan
 
-	tflog.Debug(ctx, "NIC speed in Create", map[string]any{
-		"api":   server.NICSpeed,
-		"state": state.NICSpeed.ValueInt64(),
-	})
-
 	// Map response body to schema and populate Computed attribute values
 
 	state.Memory = types.Int64Value(server.Memory)
@@ -277,19 +272,19 @@ func (r *piServerResource) Create(ctx context.Context, req resource.CreateReques
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (r *piServerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state piServerResourceModel
+func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var state PiResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	server, err := r.client.GetPiServer(state.Identifier.ValueString())
+	server, err := r.client.GetPi(state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error reading Mythic Beasts Pi Server",
-			"Could not read Pi Server "+state.Identifier.String()+": "+err.Error(),
+			"Error reading Mythic Beasts Pi ",
+			"Could not read Pi  "+state.Identifier.String()+": "+err.Error(),
 		)
 		return
 	}
@@ -303,9 +298,9 @@ func (r *piServerResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	tflog.Warn(ctx, fmt.Sprintf("memory from api: %d - memory from state: %d", server.Memory, state.Memory.ValueInt64()))
-	tflog.Warn(ctx, fmt.Sprintf("ssh port from api: %d - ssh port from state: %d", server.SSHPort, state.SSHPort.ValueInt64()))
-	tflog.Warn(ctx, fmt.Sprintf("location from api: %s - location from state: %s", server.Location, state.Location.ValueString()))
+	tflog.Warn(ctx, fmt.Sprintf("memory from aPi: %d - memory from state: %d", server.Memory, state.Memory.ValueInt64()))
+	tflog.Warn(ctx, fmt.Sprintf("ssh port from aPi: %d - ssh port from state: %d", server.SSHPort, state.SSHPort.ValueInt64()))
+	tflog.Warn(ctx, fmt.Sprintf("location from aPi: %s - location from state: %s", server.Location, state.Location.ValueString()))
 
 	state.Memory = types.Int64Value(server.Memory)
 	state.CPUSpeed = types.Int64Value(server.CPUSpeed)
@@ -323,29 +318,29 @@ func (r *piServerResource) Read(ctx context.Context, req resource.ReadRequest, r
 }
 
 // Update updates the resource and sets the updated Terraform state on success.
-func (r *piServerResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *PiResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
-func (r *piServerResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state piServerResourceModel
+func (r *PiResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var state PiResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	err := r.client.DeletePiServer(state.Identifier.ValueString())
+	err := r.client.DeletePi(state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error deleting Pi Server",
-			"Could not delete Pi Server, unexpected error: "+err.Error(),
+			"Error deleting Pi ",
+			"Could not delete Pi , unexpected error: "+err.Error(),
 		)
 		return
 	}
 }
 
-func (r *piServerResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *PiResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
 	resource.ImportStatePassthroughID(ctx, path.Root("identifier"), req, resp)
 }

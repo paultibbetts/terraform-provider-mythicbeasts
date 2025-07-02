@@ -11,7 +11,7 @@ provider "mythicbeasts" {
   secret = "DVFekI5rfWMeF5BdjCylY60cBAZW87"
 }
 
-resource "mythicbeasts_pi_server" "four" {
+resource "mythicbeasts_pi" "four" {
   identifier   = "pi4createdbytf"
   model        = 4
   os_image     = "rpi-bookworm-arm64"
@@ -20,7 +20,7 @@ resource "mythicbeasts_pi_server" "four" {
   memory       = 4096
 }
 
-resource "mythicbeasts_pi_server" "three" {
+resource "mythicbeasts_pi" "three" {
   identifier   = "pi3createdbytf"
   model        = 3
   os_image     = "rpi-bookworm-arm64"
