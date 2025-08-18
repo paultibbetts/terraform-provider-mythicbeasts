@@ -1,7 +1,5 @@
 dario.cat/mergo v1.0.0 h1:AGCNq9Evsj31mOgNPcLyXc+4PNABt905YmuqPYYpBWk=
 dario.cat/mergo v1.0.0/go.mod h1:uNxQE+84aUszobStD9th8a29P2fMDhsBdgRYvZOxGmk=
-gitea.cloud.paultibbetts.uk/paul/mythicbeasts-client-go v0.0.0-20250818141009-cb9e2049be1c h1:HjIrEl0T5O7lfDkM4jjeNDHSbTgIMr+46i6gnvglZPU=
-gitea.cloud.paultibbetts.uk/paul/mythicbeasts-client-go v0.0.0-20250818141009-cb9e2049be1c/go.mod h1:Puz5uiRZwmy4pOjibCmVEjUbG1tBMTESjk1+V2qhJok=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/ProtonMail/go-crypto v1.1.6 h1:ZcV+Ropw6Qn0AX9brlQLAUXfqLBc7Bl+f/DmNxpLfdw=
@@ -136,6 +134,8 @@ github.com/mitchellh/reflectwalk v1.0.2 h1:G2LzWKi524PWgd3mLHV8Y5k7s6XUvT0Gef6zx
 github.com/mitchellh/reflectwalk v1.0.2/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/oklog/run v1.0.0 h1:Ru7dDtJNOyC66gQ5dQmaCa0qIsAUFY3sFpK1Xk8igrw=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
+github.com/paultibbetts/mythicbeasts-client-go v0.1.0 h1:pL7wJGJWnuh5Je2n7Pxgv6ZUsv6eIwfu4hy6PMS2hFs=
+github.com/paultibbetts/mythicbeasts-client-go v0.1.0/go.mod h1:Puz5uiRZwmy4pOjibCmVEjUbG1tBMTESjk1+V2qhJok=
 github.com/pjbgf/sha1cd v0.3.2 h1:a9wb0bp1oC2TGwStyn0Umc/IGKQnEgF0vVaZ8QF8eo4=
 github.com/pjbgf/sha1cd v0.3.2/go.mod h1:zQWigSxVmsHEZow5qaLtPYxpcKMMQpa09ixqBxuCS6A=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
