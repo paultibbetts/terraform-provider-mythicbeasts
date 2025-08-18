@@ -5,17 +5,21 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 
+"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-
-	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/paultibbetts/mythicbeasts-client-go"
@@ -56,7 +60,7 @@ type PiResourceModel struct {
 
 // Metadata returns the resource type name.
 func (r *PiResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_Pi"
+	resp.TypeName = req.ProviderTypeName + "_pi"
 }
 
 // Schema defines the schema for the resource.
@@ -65,19 +69,37 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 		Attributes: map[string]schema.Attribute{
 			"identifier": schema.StringAttribute{
 				Required: true,
-				// needs a validator
-				// can only be between 3 and 20 characters long
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(3, 20),
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`^[a-zA-Z0-9\-]*$`),
+						"must consist only of alphanumerics and -",
+					),
+				},
+				MarkdownDescription: "A unique identifier for the server. This will form part of the hostname for the server, and must consist only of lower-case letters and digits and be at most 20 characters long",
 			},
 			"disk_size": schema.Int64Attribute{
 				Computed: true,
 				Optional: true,
 				Default:  int64default.StaticInt64(10),
-				// needs a validator
-				// can only be multiples of 10
+				MarkdownDescription: "Disk space size, in GB. Must be a multiple of 10",
+				Validators: []validator.Int64{
+					MultipleOfTen(),
+				},
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplace(),
+				},
 			},
 			"ssh_key": schema.StringAttribute{
-				Computed: true,
 				Optional: true,
+				WriteOnly: true,
+				MarkdownDescription: "Public SSH key(s) to be added to /root/.ssh/authorized_keys on server",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"model": schema.Int64Attribute{
 				Computed: true,
@@ -86,26 +108,31 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.RequiresReplace(),
 				},
+				Validators: []validator.Int64{
+					int64validator.OneOf(3, 4),
+				},
+				MarkdownDescription: "Raspberry Pi model (3 or 4)",
 			},
 			"memory": schema.Int64Attribute{
-				Computed:    false,
+				Computed:    true,
 				Optional:    true,
-				Description: "RAM size in MB. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
-				//PlanModifiers: []planmodifier.Int64{
-				//	int64planmodifier.UseStateForUnknown(),
-				//},
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplace(),
+				},
+				MarkdownDescription: "RAM size in MB. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 			},
 			"cpu_speed": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
-				Description: "CPU speed in MHz. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
+				MarkdownDescription: "CPU speed in MHz. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplace(),
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"nic_speed": schema.Int64Attribute{
 				Computed:    true,
-				Description: "CPU speed in MHz. Only used on creation. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
+				MarkdownDescription: "CPU speed in MHz. Only used on creation. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
@@ -113,32 +140,42 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 			"os_image": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
-				//PlanModifiers: []planmodifier.String{
-				//	stringplanmodifier.UseStateForUnknown(),
-				//},
+				MarkdownDescription: "Operating system image",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"wait_for_dns": schema.BoolAttribute{
 				Computed: true,
 				Optional: true,
 				Default:  booldefault.StaticBool(false),
+				MarkdownDescription: "Whether to wait for DNS records under hostedpi.com to become available before completing provisioning.",
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"ip": schema.StringAttribute{
 				Computed: true,
-				//PlanModifiers: []planmodifier.String{
-				//	stringplanmodifier.UseStateForUnknown(),
-				//},
+				MarkdownDescription: "IPv6 address for server",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"ssh_port": schema.Int64Attribute{
 				Computed: true,
-				//PlanModifiers: []planmodifier.Int64{
-				//	int64planmodifier.UseStateForUnknown(),
-				//},
+				MarkdownDescription: "Port for accessing SSH via IPv4 relay. Server is accessible on `ssh.{identifier}.hostedpi.com`.",
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"location": schema.StringAttribute{
 				Computed: true,
-				//PlanModifiers: []planmodifier.String{
-				//	stringplanmodifier.UseStateForUnknown(),
-				//},
+				MarkdownDescription: "Data centre in which server is located",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -176,9 +213,20 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 		return
 	}
 
+	var config PiResourceModel
+	d := req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(d...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	var Pi mythicbeasts.CreatePiRequest
 
 	identifier := plan.Identifier.ValueString()
+
+	if !config.SSHKey.IsNull() && !config.SSHKey.IsUnknown() {
+		Pi.SSHKey = config.SSHKey.ValueString()
+	}
 
 	if !plan.Model.IsNull() && !plan.Model.IsUnknown() {
 		Pi.Model = plan.Model.ValueInt64()
@@ -194,10 +242,6 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 
 	if !plan.DiskSize.IsNull() && !plan.DiskSize.IsUnknown() {
 		Pi.DiskSize = plan.DiskSize.ValueInt64()
-	}
-
-	if !plan.SSHKey.IsNull() && !plan.SSHKey.IsUnknown() {
-		Pi.SSHKey = plan.SSHKey.ValueString()
 	}
 
 	if !plan.OSImage.IsNull() && !plan.OSImage.IsUnknown() {
