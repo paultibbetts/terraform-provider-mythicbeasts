@@ -110,7 +110,7 @@ func (d *piModelsDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 
 	// Map response body to model
-	for _, model := range *piModels {
+	for _, model := range piModels {
 		if !config.Model.IsNull() && model.Model != config.Model.ValueInt64() {
 			continue
 		}

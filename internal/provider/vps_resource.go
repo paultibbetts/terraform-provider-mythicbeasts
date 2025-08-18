@@ -478,7 +478,7 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 }
 
-func readServer(ctx context.Context, server *mythicbeasts.VPS) (*VPSResourceModel, diag.Diagnostics) {
+func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel, diag.Diagnostics) {
 	var state VPSResourceModel
 	var diags diag.Diagnostics
 

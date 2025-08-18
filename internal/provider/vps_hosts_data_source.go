@@ -102,7 +102,7 @@ func (d *VPSHostsDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	var state VPSHostsDataSourceModel
 
-	for _, host := range *VPSHosts {
+	for _, host := range VPSHosts {
 		disk := VPSHostDiskInfoModel{
 			SSD: types.Int64Value(int64(host.Disk.SSD)),
 			HDD: types.Int64Value(host.Disk.HDD),
