@@ -2,7 +2,7 @@ module terraform-provider-mythicbeasts
 
 go 1.24.3
 
-replace github.com/paultibbetts/mythicbeasts-client-go => /Users/paul/code/mythicbeasts-client-go
+replace github.com/paultibbetts/mythicbeasts-client-go => gitea.cloud.paultibbetts.uk/paul/mythicbeasts-client-go v0.0.0-20250818141009-cb9e2049be1c
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.15.0
@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.28.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-testing v1.13.2
-	github.com/paultibbetts/mythicbeasts-client-go v0.0.0-00010101000000-000000000000
+	github.com/paultibbetts/mythicbeasts-client-go v0.0.0-20250818141009-cb9e2049be1c
 )
 
 require (
