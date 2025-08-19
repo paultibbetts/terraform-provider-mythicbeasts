@@ -12,7 +12,7 @@ terraform {
 data "mythicbeasts_vps_disk_sizes" "all" {}
 
 output "all_disk_sizes" {
-	value = data.mythicbeasts_vps_disk_sizes.all
+  value = data.mythicbeasts_vps_disk_sizes.all
 }
 
 

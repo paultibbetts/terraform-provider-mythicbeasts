@@ -11,7 +11,7 @@ terraform {
 
 resource "mythicbeasts_pi" "four" {
   identifier   = "pangolin-on-a"
-  disk_size = 20
+  disk_size    = 20
   model        = 4
   os_image     = "rpi-bookworm-arm64"
   ssh_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e code@paultibbetts.uk"
