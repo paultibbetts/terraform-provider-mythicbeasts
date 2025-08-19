@@ -6,11 +6,6 @@ terraform {
   }
 }
 
-provider "mythicbeasts" {
-  keyid  = "wmmncd9gpha8vk8p"
-  secret = "DVFekI5rfWMeF5BdjCylY60cBAZW87"
-}
-
 resource "mythicbeasts_pi" "four" {
   identifier   = "pangolin-on-a"
   disk_size = 20

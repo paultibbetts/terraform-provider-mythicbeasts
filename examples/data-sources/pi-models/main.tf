@@ -6,11 +6,6 @@ terraform {
   }
 }
 
-provider "mythicbeasts" {
-  keyid  = "wmmncd9gpha8vk8p"
-  secret = "DVFekI5rfWMeF5BdjCylY60cBAZW87"
-}
-
 data "mythicbeasts_pi_models" "all" {}
 
 data "mythicbeasts_pi_models" "three" {
