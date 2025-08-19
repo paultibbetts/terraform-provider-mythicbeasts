@@ -99,7 +99,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(3, 20),
 					stringvalidator.RegexMatches(
-						regexp.MustCompile(`^[a-zA-Z0-9]*$`),
+						regexp.MustCompile(`^[a-z0-9]*$`),
 						"must consist only of lower-case letters and digits",
 					),
 				},
