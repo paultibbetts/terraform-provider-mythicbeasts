@@ -19,13 +19,13 @@ resource "mythicbeasts_pi" "four" {
   memory       = 4096
 }
 
-//resource "mythicbeasts_pi" "three" {
-//  identifier   = "maybelast3attempt"
-//  model        = 3
-//  disk_size = 20
-//  os_image     = "rpi-bookworm-arm64"
-//  ssh_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e code@paultibbetts.uk"
-//  wait_for_dns = false
-//  memory = 1024
-//}
+resource "mythicbeasts_pi" "three" {
+  identifier   = "maybelast3attempt"
+  model        = 3
+  disk_size    = 20
+  os_image     = "rpi-bookworm-arm64"
+  ssh_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e code@paultibbetts.uk"
+  wait_for_dns = false
+  memory       = 1024
+}
 
