@@ -50,6 +50,7 @@ type VPSResourceModel struct {
 	Identifier     types.String `tfsdk:"identifier"`
 	Product        types.String `tfsdk:"product"`
 	Name           types.String `tfsdk:"name"`
+	Hostname       types.String `tfsdk:"hostname"`
 	SetForwardDNS  types.Bool   `tfsdk:"set_forward_dns"`
 	SetReverseDNS  types.Bool   `tfsdk:"set_reverse_dns"`
 	UserData       types.String `tfsdk:"user_data"`
@@ -270,11 +271,17 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				},
 				MarkdownDescription: "List of IPv6 addresses",
 			},
-			"zone": schema.ObjectAttribute{
+			"zone": schema.SingleNestedAttribute{
 				Computed: true,
-				AttributeTypes: map[string]attr.Type{
-					"code": types.StringType,
-					"name": types.StringType,
+				Attributes: map[string]schema.Attribute{
+					"code": schema.StringAttribute{
+						Computed:            true,
+						MarkdownDescription: "Zone Code",
+					},
+					"name": schema.StringAttribute{
+						Computed:            true,
+						MarkdownDescription: "Zone Name",
+					},
 				},
 				PlanModifiers: []planmodifier.Object{
 					objectplanmodifier.UseStateForUnknown(),
@@ -326,11 +333,18 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				},
 				MarkdownDescription: "List of MAC addresses",
 			},
-			"ssh_proxy": schema.ObjectAttribute{
+			"ssh_proxy": schema.SingleNestedAttribute{
 				Computed: true,
-				AttributeTypes: map[string]attr.Type{
-					"hostname": types.StringType,
-					"port":     types.Int64Type,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"hostname": schema.StringAttribute{
+						Computed:            true,
+						MarkdownDescription: "SSH proxy hostname",
+					},
+					"port": schema.Int64Attribute{
+						Computed:            true,
+						MarkdownDescription: "SSH proxy port",
+					},
 				},
 				PlanModifiers: []planmodifier.Object{
 					objectplanmodifier.UseStateForUnknown(),
@@ -481,9 +495,6 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel, diag.Diagnostics) {
 	var state VPSResourceModel
 	var diags diag.Diagnostics
-
-	tflog.Info(ctx, fmt.Sprintf("the name was returned as: %s\n", server.Name))
-	fmt.Printf("the name was returned as %s", server.Name)
 
 	state.Identifier = types.StringValue(server.Identifier)
 	state.Name = types.StringValue(server.Name)
