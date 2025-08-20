@@ -59,8 +59,7 @@ func (r *UserDataResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				},
 			},
 			"name": schema.StringAttribute{
-				Required: true,
-				// needs a validator
+				Required:            true,
 				MarkdownDescription: "User data name",
 			},
 			"data": schema.StringAttribute{
@@ -134,14 +133,14 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 	if err != nil {
 		tflog.Warn(ctx, "Failed to marshal User Data for logging", map[string]interface{}{"error": err.Error()})
 	} else {
-		var UserDataMap map[string]interface{}
+		var UserDataMap map[string]any
 		err = json.Unmarshal(UserDataJSON, &UserDataMap)
 		if err != nil {
-			tflog.Warn(ctx, "Failed to unmarshal UserData JSON for logging", map[string]interface{}{"error": err.Error()})
+			tflog.Warn(ctx, "Failed to unmarshal UserData JSON for logging", map[string]any{"error": err.Error()})
 		}
 	}
 
-	data, err := r.client.CreateUserData(UserData)
+	_, err = r.client.CreateUserData(UserData)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating UserData",
@@ -150,12 +149,21 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	created, err := r.client.GetUserDataByName(plan.Name.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error creating UserData",
+			"Could not create UserData, could not fetch the created resource:"+err.Error(),
+		)
+		return
+	}
+
 	var state UserDataResourceModel
 
-	state.ID = types.Int64Value(data.ID)
-	state.Name = types.StringValue(data.Name)
-	state.Data = types.StringValue(data.Data)
-	state.Size = types.Int64Value(data.Size)
+	state.Name = types.StringValue(created.Name)
+	state.Data = types.StringValue(created.Data)
+	state.ID = types.Int64Value(created.ID)
+	state.Size = types.Int64Value(created.Size)
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -173,8 +181,6 @@ func (r *UserDataResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	tflog.Debug(ctx, "PROVIDER IS READING")
-
 	data, err := r.client.GetUserData(state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -187,9 +193,6 @@ func (r *UserDataResource) Read(ctx context.Context, req resource.ReadRequest, r
 	state.ID = types.Int64Value(data.ID)
 	state.Name = types.StringValue(data.Name)
 	state.Data = types.StringValue(data.Data)
-
-	tflog.Info(ctx, fmt.Sprintf("DEEEBUG data: %s", types.StringValue(data.Data)))
-
 	state.Size = types.Int64Value(data.Size)
 
 	diags = resp.State.Set(ctx, &state)
