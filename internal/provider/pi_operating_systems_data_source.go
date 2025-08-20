@@ -49,7 +49,7 @@ func (d *piOperatingSystemsDataSource) Schema(_ context.Context, _ datasource.Sc
 				Required:    true,
 				Description: "Filter for Pi Operating Systems with this model number",
 			},
-			"images": schema.ListNestedAttribute{
+			"images": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
