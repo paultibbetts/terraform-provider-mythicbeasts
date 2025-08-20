@@ -485,7 +485,7 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 	server, d := readServer(ctx, data)
 	diags = append(diags, d...)
 
-	diags = resp.State.Set(ctx, server)
+	diags = resp.State.Set(ctx, *server)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -662,7 +662,7 @@ func (r *VPSResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	//server.SSHKeys = types.StringValue(state.SSHKeys.ValueString())
 	//fmt.Printf("type of server: %T\n", server)
 
-	diags = resp.State.Set(ctx, server)
+	diags = resp.State.Set(ctx, *server)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
