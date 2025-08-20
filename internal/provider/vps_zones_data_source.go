@@ -46,7 +46,7 @@ func (d *VPSZonesDataSource) Metadata(_ context.Context, req datasource.Metadata
 func (d *VPSZonesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"zones": schema.ListNestedAttribute{
+			"zones": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
