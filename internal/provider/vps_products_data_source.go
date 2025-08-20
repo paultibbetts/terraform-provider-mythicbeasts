@@ -48,7 +48,7 @@ func (d *VPSProductsDataSource) Metadata(_ context.Context, req datasource.Metad
 func (d *VPSProductsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"products": schema.ListNestedAttribute{
+			"products": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
