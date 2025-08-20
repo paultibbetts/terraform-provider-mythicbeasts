@@ -20,6 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -73,12 +74,35 @@ type VPSResourceModel struct {
 	Period     types.String  `tfsdk:"period"`
 	Dormant    types.Bool    `tfsdk:"dormant"`
 	BootDevice types.String  `tfsdk:"boot_device"`
-	IPv4       types.List    `tfsdk:"ipv4"`
-	IPv6       types.List    `tfsdk:"ipv6"`
+	IPv4       types.Set     `tfsdk:"ipv4"`
+	IPv6       types.Set     `tfsdk:"ipv6"`
 	Specs      types.Object  `tfsdk:"specs"`
 	Macs       types.List    `tfsdk:"macs"`
 	SSHProxy   types.Object  `tfsdk:"ssh_proxy"`
 	VNC        types.Object  `tfsdk:"vnc"`
+}
+
+type ZoneModel struct {
+	Code types.String `tfsdk:"code"`
+	Name types.String `tfsdk:"name"`
+}
+
+type SpecsModel struct {
+	DiskType   types.String `tfsdk:"disk_type"`
+	DiskSize   types.Int64  `tfsdk:"disk_size"`
+	Cores      types.Int64  `tfsdk:"cores"`
+	ExtraCores types.Int64  `tfsdk:"extra_cores"`
+	RAM        types.Int64  `tfsdk:"ram"`
+	ExtraRAM   types.Int64  `tfsdk:"extra_ram"`
+}
+
+type VNCModel struct {
+	Mode     types.String `tfsdk:"mode"`
+	Password types.String `tfsdk:"password"`
+	IPv4     types.String `tfsdk:"ipv4"`
+	IPv6     types.String `tfsdk:"ipv6"`
+	Port     types.Int64  `tfsdk:"port"`
+	Display  types.Int64  `tfsdk:"display"`
 }
 
 // Metadata returns the resource type name.
@@ -255,19 +279,19 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				},
 				MarkdownDescription: "Boot device",
 			},
-			"ipv4": schema.ListAttribute{
+			"ipv4": schema.SetAttribute{
 				Computed:    true,
 				ElementType: types.StringType,
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.UseStateForUnknown(),
 				},
 				MarkdownDescription: "List of IPv4 addresses, if IPv4 was enabled during creation",
 			},
-			"ipv6": schema.ListAttribute{
+			"ipv6": schema.SetAttribute{
 				Computed:    true,
 				ElementType: types.StringType,
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.UseStateForUnknown(),
 				},
 				MarkdownDescription: "List of IPv6 addresses",
 			},
@@ -514,7 +538,7 @@ func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel
 	for _, ip := range server.IPv4 {
 		ipv4 = append(ipv4, types.StringValue(ip))
 	}
-	ipv4Val, d := types.ListValue(types.StringType, ipv4)
+	ipv4Val, d := types.SetValue(types.StringType, ipv4)
 	diags = append(diags, d...)
 	state.IPv4 = ipv4Val
 
@@ -522,7 +546,7 @@ func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel
 	for _, ip := range server.IPv6 {
 		ipv6 = append(ipv6, types.StringValue(ip))
 	}
-	ipv6Val, d := types.ListValue(types.StringType, ipv6)
+	ipv6Val, d := types.SetValue(types.StringType, ipv6)
 	diags = append(diags, d...)
 	state.IPv6 = ipv6Val
 
@@ -604,7 +628,6 @@ func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel
 
 	// TODO
 
-	fmt.Printf("setting disk size to %d", server.Specs.DiskSize)
 	//state.DiskSize = types.Int64Value(server.Specs.DiskSize)
 
 	// not sure if I should keep image the same and also store ISO image
@@ -625,8 +648,6 @@ func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel
 		state.Name.ValueString(),
 		state.Product.ValueString(),
 	)
-
-	fmt.Printf("type of server: %T\n", state)
 
 	return &state, diags
 }
@@ -651,24 +672,8 @@ func (r *VPSResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	fmt.Printf("data name was %s", data.Name)
-
-	tflog.Info(ctx, fmt.Sprintf("type of data: %T\n", data))
 	server, d := readServer(ctx, data)
 	diags = append(diags, d...)
-
-	//prevState := VPSResourceModel{}
-	//req.State.Get(ctx, &prevState)
-
-	// if IPv4 contains data
-	// server.IPv4Enabled = types.BoolValue(server.IPv4)
-
-	//server.Identifier = types.StringValue(state.Identifier.ValueString())
-	//server.Identifier = types.StringValue(state.Identifier.ValueString())
-	//server.Identifier = types.StringValue(state.Identifier.ValueString())
-	//server.NetDevice = types.StringValue(server.Net)
-	//server.SSHKeys = types.StringValue(state.SSHKeys.ValueString())
-	//fmt.Printf("type of server: %T\n", server)
 
 	diags = resp.State.Set(ctx, *server)
 	resp.Diagnostics.Append(diags...)
