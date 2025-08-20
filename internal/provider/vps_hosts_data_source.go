@@ -53,7 +53,7 @@ func (d *VPSHostsDataSource) Metadata(_ context.Context, req datasource.Metadata
 func (d *VPSHostsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"hosts": schema.ListNestedAttribute{
+			"hosts": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -101,6 +101,8 @@ func (d *VPSHostsDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 
 	var state VPSHostsDataSourceModel
+
+	state.Hosts = make([]VPSHostInfoModel, 0, len(VPSHosts))
 
 	for _, host := range VPSHosts {
 		disk := VPSHostDiskInfoModel{
