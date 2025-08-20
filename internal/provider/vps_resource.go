@@ -615,8 +615,16 @@ func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel
 	//state.IPv4Enabled = types.BoolValue(len(server.IPv4) > 0)
 
 	//state.SSHKeys = state.SSHKeys
-	jsonBytes, _ := json.Marshal(state)
-	fmt.Println("[DEBUG] state being returned to Terraform:", string(jsonBytes))
+
+	// this doesn't work
+	// jsonBytes, _ := json.Marshal(state)
+	// fmt.Println("[DEBUG] state being returned to Terraform:", string(jsonBytes))
+
+	fmt.Printf("[DEBUG] Identifier=%s Name=%s Product=%s\n",
+		state.Identifier.ValueString(),
+		state.Name.ValueString(),
+		state.Product.ValueString(),
+	)
 
 	fmt.Printf("type of server: %T\n", state)
 
