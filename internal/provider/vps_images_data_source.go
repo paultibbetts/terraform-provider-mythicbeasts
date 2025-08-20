@@ -44,7 +44,7 @@ func (d *VPSImagesDataSource) Metadata(_ context.Context, req datasource.Metadat
 func (d *VPSImagesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"images": schema.ListNestedAttribute{
+			"images": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
