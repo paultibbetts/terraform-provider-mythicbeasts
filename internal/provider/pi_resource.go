@@ -8,18 +8,18 @@ import (
 	"regexp"
 	"strconv"
 
-"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/paultibbetts/mythicbeasts-client-go"
@@ -82,9 +82,9 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				MarkdownDescription: "A unique identifier for the server. This will form part of the hostname for the server, and must consist only of lower-case letters and digits and be at most 20 characters long",
 			},
 			"disk_size": schema.Int64Attribute{
-				Computed: true,
-				Optional: true,
-				Default:  int64default.StaticInt64(10),
+				Computed:            true,
+				Optional:            true,
+				Default:             int64default.StaticInt64(10),
 				MarkdownDescription: "Disk space size, in GB. Must be a multiple of 10",
 				Validators: []validator.Int64{
 					MultipleOfTen(),
@@ -94,8 +94,8 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				},
 			},
 			"ssh_key": schema.StringAttribute{
-				Optional: true,
-				WriteOnly: true,
+				Optional:            true,
+				WriteOnly:           true,
 				MarkdownDescription: "Public SSH key(s) to be added to /root/.ssh/authorized_keys on server",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -114,16 +114,16 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				MarkdownDescription: "Raspberry Pi model (3 or 4)",
 			},
 			"memory": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
+				Computed: true,
+				Optional: true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.RequiresReplace(),
 				},
 				MarkdownDescription: "RAM size in MB. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 			},
 			"cpu_speed": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
+				Computed:            true,
+				Optional:            true,
 				MarkdownDescription: "CPU speed in MHz. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.RequiresReplace(),
@@ -131,15 +131,15 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				},
 			},
 			"nic_speed": schema.Int64Attribute{
-				Computed:    true,
+				Computed:            true,
 				MarkdownDescription: "CPU speed in MHz. Only used on creation. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"os_image": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:            true,
+				Optional:            true,
 				MarkdownDescription: "Operating system image",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -147,30 +147,30 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				},
 			},
 			"wait_for_dns": schema.BoolAttribute{
-				Computed: true,
-				Optional: true,
-				Default:  booldefault.StaticBool(false),
+				Computed:            true,
+				Optional:            true,
+				Default:             booldefault.StaticBool(false),
 				MarkdownDescription: "Whether to wait for DNS records under hostedpi.com to become available before completing provisioning.",
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"ip": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
 				MarkdownDescription: "IPv6 address for server",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"ssh_port": schema.Int64Attribute{
-				Computed: true,
+				Computed:            true,
 				MarkdownDescription: "Port for accessing SSH via IPv4 relay. Server is accessible on `ssh.{identifier}.hostedpi.com`.",
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"location": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
 				MarkdownDescription: "Data centre in which server is located",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -306,6 +306,7 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 	state.SSHPort = types.Int64Value(server.SSHPort)
 	state.DiskSize = types.Int64Value(int64(diskSize))
 	state.Location = types.StringValue(server.Location)
+	state.Model = types.Int64Value(server.Model)
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, &state)
@@ -353,6 +354,7 @@ func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 	state.SSHPort = types.Int64Value(server.SSHPort)
 	state.DiskSize = types.Int64Value(int64(diskSize))
 	state.Location = types.StringValue(server.Location)
+	state.Model = types.Int64Value(server.Model)
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
