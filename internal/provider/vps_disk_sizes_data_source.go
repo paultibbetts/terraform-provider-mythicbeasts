@@ -44,7 +44,7 @@ func (d *VPSDiskSizesDataSource) Metadata(_ context.Context, req datasource.Meta
 func (d *VPSDiskSizesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"hdd": schema.ListNestedAttribute{
+			"hdd": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -54,7 +54,7 @@ func (d *VPSDiskSizesDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 					},
 				},
 			},
-			"ssd": schema.ListNestedAttribute{
+			"ssd": schema.SetNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
