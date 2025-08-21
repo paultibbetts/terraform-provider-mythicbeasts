@@ -504,8 +504,8 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	server, d := readServer(ctx, data)
-	diags = append(diags, d...)
+	server, d := readServer(data)
+	resp.Diagnostics.Append(d...)
 
 	diags = resp.State.Set(ctx, *server)
 	resp.Diagnostics.Append(diags...)
@@ -514,7 +514,7 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 }
 
-func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel, diag.Diagnostics) {
+func readServer(server mythicbeasts.VPS) (*VPSResourceModel, diag.Diagnostics) {
 	var state VPSResourceModel
 	var diags diag.Diagnostics
 
@@ -647,8 +647,8 @@ func (r *VPSResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	server, d := readServer(ctx, data)
-	diags = append(diags, d...)
+	server, d := readServer(data)
+	resp.Diagnostics.Append(d...)
 
 	diags = resp.State.Set(ctx, *server)
 	resp.Diagnostics.Append(diags...)

@@ -17,7 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-// helper
+// Helper function to find a specific resource in state.
 func findResource(st *tfjson.State, addr string) *tfjson.StateResource {
 	if st == nil || st.Values == nil || st.Values.RootModule == nil {
 		return nil
