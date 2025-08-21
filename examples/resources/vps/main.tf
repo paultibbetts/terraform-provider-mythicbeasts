@@ -9,9 +9,9 @@ terraform {
   }
 }
 
-resource "mythicbeasts_vps" "test" {
-  identifier     = "paulsvpsinuk"
-  name           = "paulsvpsinuk"
+resource "mythicbeasts_vps" "example" {
+  identifier     = "example"
+  name           = "example"
   disk_size      = 10240
   image          = "cloudinit-ubuntu-noble.raw.gz"
   ipv4_enabled   = false

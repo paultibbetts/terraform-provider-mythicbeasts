@@ -10,8 +10,8 @@ terraform {
 }
 
 resource "mythicbeasts_pi" "four" {
-  identifier   = "pangolin-on-a"
-  disk_size    = 20
+  identifier   = "raspberrypi4"
+  disk_size    = 10
   model        = 4
   os_image     = "rpi-bookworm-arm64"
   ssh_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e code@paultibbetts.uk"
@@ -20,9 +20,9 @@ resource "mythicbeasts_pi" "four" {
 }
 
 resource "mythicbeasts_pi" "three" {
-  identifier   = "maybelast3attempt"
+  identifier   = "raspberrypi3"
   model        = 3
-  disk_size    = 20
+  disk_size    = 10
   os_image     = "rpi-bookworm-arm64"
   ssh_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e code@paultibbetts.uk"
   wait_for_dns = false
