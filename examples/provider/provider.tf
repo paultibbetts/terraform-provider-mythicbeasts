@@ -1,3 +1,3 @@
-provider "scaffolding" {
+provider "mythicbeasts" {
   # example configuration here
 }
