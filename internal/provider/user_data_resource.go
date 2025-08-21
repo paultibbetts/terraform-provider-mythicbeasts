@@ -124,8 +124,6 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 
 	var UserData mythicbeasts.NewUserData
 
-	// set values from the plan
-
 	UserData.Name = plan.Name.ValueString()
 	UserData.Data = plan.Data.ValueString()
 

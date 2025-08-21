@@ -13,13 +13,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-var userData = "#cloud-config\n\npackages:\n  - apache2\n\n"
-var size = int64(len(userData))
+var testAccUserData = "#cloud-config\n\npackages:\n  - apache2\n\n"
+var testAccUserDataSize = int64(len(testAccUserData))
 
 func TestAccUserDataResource(t *testing.T) {
-	t.Setenv("TF_LOG", "INFO")
-	t.Setenv("TF_LOG_PATH", "-")
-	t.Setenv("TF_ACC_TERRAFORM_LOG_PATH", "-")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -41,21 +38,21 @@ func TestAccUserDataResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_user_data.web-server",
 						tfjsonpath.New("data"),
-						knownvalue.StringExact(userData),
+						knownvalue.StringExact(testAccUserData),
 					),
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_user_data.web-server",
 						tfjsonpath.New("size"),
-						knownvalue.Int64Exact(size),
+						knownvalue.Int64Exact(testAccUserDataSize),
 					),
 				},
 			},
 			// ImportState testing
-			//{
-			//	ResourceName:      "mythicbeasts_user_data.web-server",
-			//	ImportState:       true,
-			//	ImportStateVerify: true,
-			//},
+			{
+				ResourceName:      "mythicbeasts_user_data.web-server",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update and Read testing
 			//{},
 			// Delete testing automatically occurs in TestCase
