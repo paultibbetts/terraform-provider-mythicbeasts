@@ -469,8 +469,6 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 		VPS.Zone = config.CreateInZone.ValueString()
 	}
 
-	// set values from the plan
-
 	VPS.Product = plan.Product.ValueString()
 	VPS.Name = plan.Name.ValueString()
 	VPS.Tablet = plan.Tablet.ValueBool()
@@ -625,29 +623,6 @@ func readServer(ctx context.Context, server mythicbeasts.VPS) (*VPSResourceModel
 	)
 	diags = append(diags, d...)
 	state.Specs = specs
-
-	// TODO
-
-	//state.DiskSize = types.Int64Value(server.Specs.DiskSize)
-
-	// not sure if I should keep image the same and also store ISO image
-	// because it seems to be different
-	// state.Image = types.StringValue(server.ISOImage)
-	state.ISOImage = types.StringValue(server.ISOImage)
-
-	//state.IPv4Enabled = types.BoolValue(len(server.IPv4) > 0)
-
-	//state.SSHKeys = state.SSHKeys
-
-	// this doesn't work
-	// jsonBytes, _ := json.Marshal(state)
-	// fmt.Println("[DEBUG] state being returned to Terraform:", string(jsonBytes))
-
-	fmt.Printf("[DEBUG] Identifier=%s Name=%s Product=%s\n",
-		state.Identifier.ValueString(),
-		state.Name.ValueString(),
-		state.Product.ValueString(),
-	)
 
 	return &state, diags
 }
