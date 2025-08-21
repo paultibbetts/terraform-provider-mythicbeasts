@@ -138,7 +138,7 @@ func (p *mythicbeastsProvider) Configure(ctx context.Context, req provider.Confi
 	}
 
 	// Create a new mythicbeasts client using the configuration values
-	client, err := mythicbeasts.NewClient(&keyid, &secret)
+	client, err := mythicbeasts.NewClient(keyid, secret)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Create Mythic Beasts API Client",
