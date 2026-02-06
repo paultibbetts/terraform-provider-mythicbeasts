@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
@@ -18,7 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/float64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
@@ -118,6 +118,9 @@ func (r *VPSResource) Metadata(_ context.Context, req resource.MetadataRequest, 
 // Schema defines the schema for the resource.
 func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Manages a Mythic Beasts VPS.\n\n" +
+			"In-place updates are supported for `product`, `name`, `disk_size`, `specs.extra_cores`, `specs.extra_ram`, `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, and `tablet`.\n\n" +
+			"The Mythic Beasts API requires the VPS to be powered off before changing `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`. Automatic power-state orchestration is not currently supported.",
 		Attributes: map[string]schema.Attribute{
 			"identifier": schema.StringAttribute{
 				Required: true,
@@ -155,6 +158,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 			},
 			"hostname": schema.StringAttribute{
 				Optional:            true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
 				MarkdownDescription: "Hostname the new server should be installed with\nDefault: `{identifier}.vs.mythic-beasts.com`",
 			},
 			"set_forward_dns": schema.BoolAttribute{
@@ -189,7 +193,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Optional:  true,
 				WriteOnly: true,
 				// TODO not a datasource
-				MarkdownDescription: "Stored user data ID or name; see the `mythicbeasts_user_data` datasource for valid values",
+				MarkdownDescription: "Stored user data ID or name; see the `mythicbeasts_user_data` resource for valid values",
 			},
 			"user_data_string": schema.StringAttribute{
 				Optional:            true,
@@ -211,6 +215,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Optional: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.RequiresReplace(),
 				},
 				MarkdownDescription: "Name of private cloud host server to provision on; see the `mythicbeasts_hosts` data source for valid values",
 			},
@@ -223,9 +228,8 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-					stringplanmodifier.RequiresReplace(),
 				},
-				MarkdownDescription: "Possible values:\n- `performance`\n- `compatibility`\nDefault: `performance`",
+				MarkdownDescription: "CPU mode.\nPossible values:\n- `performance`\n- `compatibility`\nDefault: `performance`\n\nChanging this setting via the API requires the VPS to be powered off.",
 			},
 			"net_device": schema.StringAttribute{
 				Computed: true,
@@ -236,9 +240,8 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-					stringplanmodifier.RequiresReplace(),
 				},
-				MarkdownDescription: "Virtual network device type\nPossible values:\n- `virtio`\n- `e1000`\n-`rtl8139`\n- `ne2k_pci`\nDefault: `virtio`",
+				MarkdownDescription: "Virtual network device type\nPossible values:\n- `virtio`\n- `e1000`\n-`rtl8139`\n- `ne2k_pci`\nDefault: `virtio`\n\nChanging this setting via the API requires the VPS to be powered off.",
 			},
 			"disk_bus": schema.StringAttribute{
 				Computed: true,
@@ -249,26 +252,22 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-					stringplanmodifier.RequiresReplace(),
 				},
-				MarkdownDescription: "(Optional) Virtual disk bus adapter type\nPossible values:\n-`virtio`\n-`sata`\n-`scsi`\n-`ide`\nDefault: `virtio`",
+				MarkdownDescription: "(Optional) Virtual disk bus adapter type\nPossible values:\n-`virtio`\n-`sata`\n-`scsi`\n-`ide`\nDefault: `virtio`\n\nChanging this setting via the API requires the VPS to be powered off.",
 			},
 			"tablet": schema.BoolAttribute{
-				Computed: true,
-				Optional: true,
-				Default:  booldefault.StaticBool(true),
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.RequiresReplace(),
-				},
-				MarkdownDescription: "Tablet mode for VNC mouse pointer\nDefault: `true`",
+				Computed:            true,
+				Optional:            true,
+				Default:             booldefault.StaticBool(true),
+				MarkdownDescription: "Tablet mode for VNC mouse pointer\nDefault: `true`\n\nChanging this setting via the API requires the VPS to be powered off.",
 			},
 			"iso_image": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-					stringplanmodifier.RequiresReplace(),
 				},
-				MarkdownDescription: "ISO image currently in virtual CD drive",
+				MarkdownDescription: "ISO image currently in virtual CD drive. Set to `null` to remove.\n\nChanging this setting via the API requires the VPS to be powered off.",
 			},
 			"family": schema.StringAttribute{
 				Computed: true,
@@ -301,9 +300,8 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Optional: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
-					stringplanmodifier.RequiresReplace(),
 				},
-				MarkdownDescription: "Boot device",
+				MarkdownDescription: "Boot device.\n\nChanging this setting via the API requires the VPS to be powered off.",
 			},
 			"ipv4": schema.SetAttribute{
 				Computed:    true,
@@ -340,6 +338,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 			},
 			"specs": schema.SingleNestedAttribute{
 				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"disk_type": schema.StringAttribute{
 						Computed:            true,
@@ -358,7 +357,14 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 						MarkdownDescription: "Number of virtual CPU cores",
 					},
 					"extra_cores": schema.Int64Attribute{
-						Computed:            true,
+						Computed: true,
+						Optional: true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(0),
+						},
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.UseStateForUnknown(),
+						},
 						MarkdownDescription: "Number of CPU cores in addition to the ones provided by the base product (private cloud only)",
 					},
 					"ram": schema.Int64Attribute{
@@ -366,7 +372,15 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 						MarkdownDescription: "RAM size in MB",
 					},
 					"extra_ram": schema.Int64Attribute{
-						Computed:            true,
+						Computed: true,
+						Optional: true,
+						Validators: []validator.Int64{
+							int64validator.AtLeast(0),
+							MultipleOf(1024),
+						},
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.UseStateForUnknown(),
+						},
 						MarkdownDescription: "Amount of RAM (in MB) in addition to the RAM provided by the base product (private cloud only)",
 					},
 				},
@@ -484,6 +498,8 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 	resp.Diagnostics.Append(d...)
 
 	VPS.IPv4 = config.IPv4Enabled.ValueBool()
+	VPS.SetForwardDNS = config.SetForwardDNS.ValueBool()
+	VPS.SetReverseDNS = config.SetReverseDNS.ValueBool()
 	VPS.DiskSize = config.DiskSize.ValueInt64()
 	VPS.Image = config.Image.ValueString()
 
@@ -495,9 +511,48 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 		VPS.Zone = config.CreateInZone.ValueString()
 	}
 
+	if !config.UserData.IsNull() && !config.UserData.IsUnknown() {
+		VPS.UserData = config.UserData.ValueString()
+	}
+
+	if !config.UserDataString.IsNull() && !config.UserDataString.IsUnknown() {
+		VPS.UserDataString = config.UserDataString.ValueString()
+	}
+
 	VPS.Product = plan.Product.ValueString()
 	VPS.Name = plan.Name.ValueString()
-	VPS.Tablet = plan.Tablet.ValueBool()
+
+	if !plan.Hostname.IsNull() && !plan.Hostname.IsUnknown() {
+		VPS.Hostname = plan.Hostname.ValueString()
+	}
+
+	if !plan.HostServer.IsNull() && !plan.HostServer.IsUnknown() {
+		VPS.HostServer = plan.HostServer.ValueString()
+	}
+
+	if !plan.CPUMode.IsNull() && !plan.CPUMode.IsUnknown() {
+		VPS.CPUMode = plan.CPUMode.ValueString()
+	}
+
+	if !plan.NetDevice.IsNull() && !plan.NetDevice.IsUnknown() {
+		VPS.NetDevice = plan.NetDevice.ValueString()
+	}
+
+	if !plan.DiskBus.IsNull() && !plan.DiskBus.IsUnknown() {
+		VPS.DiskBus = plan.DiskBus.ValueString()
+	}
+
+	if !plan.Tablet.IsNull() && !plan.Tablet.IsUnknown() {
+		VPS.Tablet = plan.Tablet.ValueBool()
+	}
+
+	if extraCores, ok := specInt64FromSpecsObject(plan.Specs, "extra_cores"); ok {
+		VPS.ExtraCores = extraCores
+	}
+
+	if extraRAM, ok := specInt64FromSpecsObject(plan.Specs, "extra_ram"); ok {
+		VPS.ExtraRAM = extraRAM
+	}
 
 	VPSJSON, err := json.Marshal(VPS)
 	if err != nil {
@@ -557,6 +612,7 @@ func readServer(server mbVPS.Server) (*VPSResourceModel, diag.Diagnostics) {
 	state.Period = types.StringValue(server.Period)
 	state.Dormant = types.BoolValue(server.Dormant)
 	state.BootDevice = types.StringValue(server.BootDevice)
+	state.ISOImage = types.StringValue(server.ISOImage)
 
 	ipv4 := []attr.Value{}
 	for _, ip := range server.IPv4 {
@@ -685,6 +741,179 @@ func (r *VPSResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *VPSResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan VPSResourceModel
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var config VPSResourceModel
+	diags = req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state VPSResourceModel
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	patch := make(map[string]any)
+	hasPatch := false
+	powerSensitivePatch := false
+
+	if plan.Product.ValueString() != state.Product.ValueString() {
+		patch["product"] = plan.Product.ValueString()
+		hasPatch = true
+	}
+
+	if plan.Name.ValueString() != state.Name.ValueString() {
+		patch["name"] = plan.Name.ValueString()
+		hasPatch = true
+	}
+
+	if !plan.BootDevice.IsNull() && !plan.BootDevice.IsUnknown() && plan.BootDevice.ValueString() != state.BootDevice.ValueString() {
+		patch["boot_device"] = plan.BootDevice.ValueString()
+		hasPatch = true
+		powerSensitivePatch = true
+	}
+
+	if !plan.CPUMode.IsNull() && !plan.CPUMode.IsUnknown() && plan.CPUMode.ValueString() != state.CPUMode.ValueString() {
+		patch["cpu_mode"] = plan.CPUMode.ValueString()
+		hasPatch = true
+		powerSensitivePatch = true
+	}
+
+	if !plan.NetDevice.IsNull() && !plan.NetDevice.IsUnknown() && plan.NetDevice.ValueString() != state.NetDevice.ValueString() {
+		patch["net_device"] = plan.NetDevice.ValueString()
+		hasPatch = true
+		powerSensitivePatch = true
+	}
+
+	if !plan.DiskBus.IsNull() && !plan.DiskBus.IsUnknown() && plan.DiskBus.ValueString() != state.DiskBus.ValueString() {
+		patch["disk_bus"] = plan.DiskBus.ValueString()
+		hasPatch = true
+		powerSensitivePatch = true
+	}
+
+	if !plan.Tablet.IsNull() && !plan.Tablet.IsUnknown() && plan.Tablet.ValueBool() != state.Tablet.ValueBool() {
+		patch["tablet"] = plan.Tablet.ValueBool()
+		hasPatch = true
+		powerSensitivePatch = true
+	}
+
+	specsPatch := map[string]any{}
+
+	if !config.DiskSize.IsNull() && !config.DiskSize.IsUnknown() {
+		desiredDiskSize := config.DiskSize.ValueInt64()
+		currentDiskSize, hasCurrentDiskSize := diskSizeFromSpecsObject(state.Specs)
+
+		if !hasCurrentDiskSize || desiredDiskSize != currentDiskSize {
+			specsPatch["disk_size"] = desiredDiskSize
+		}
+	}
+
+	if desiredExtraCores, ok := specInt64FromSpecsObject(plan.Specs, "extra_cores"); ok {
+		currentExtraCores, hasCurrentExtraCores := specInt64FromSpecsObject(state.Specs, "extra_cores")
+		if !hasCurrentExtraCores || desiredExtraCores != currentExtraCores {
+			specsPatch["extra_cores"] = desiredExtraCores
+		}
+	}
+
+	if desiredExtraRAM, ok := specInt64FromSpecsObject(plan.Specs, "extra_ram"); ok {
+		currentExtraRAM, hasCurrentExtraRAM := specInt64FromSpecsObject(state.Specs, "extra_ram")
+		if !hasCurrentExtraRAM || desiredExtraRAM != currentExtraRAM {
+			specsPatch["extra_ram"] = desiredExtraRAM
+		}
+	}
+
+	if len(specsPatch) > 0 {
+		patch["specs"] = specsPatch
+		hasPatch = true
+	}
+
+	if !plan.ISOImage.IsUnknown() {
+		currentISOImage := ""
+		if !state.ISOImage.IsNull() && !state.ISOImage.IsUnknown() {
+			currentISOImage = state.ISOImage.ValueString()
+		}
+
+		if plan.ISOImage.IsNull() {
+			if currentISOImage != "" {
+				patch["iso_image"] = nil
+				hasPatch = true
+				powerSensitivePatch = true
+			}
+		} else if plan.ISOImage.ValueString() != currentISOImage {
+			patch["iso_image"] = plan.ISOImage.ValueString()
+			hasPatch = true
+			powerSensitivePatch = true
+		}
+	}
+
+	if hasPatch {
+		endpoint := fmt.Sprintf("/vps/servers/%s", state.Identifier.ValueString())
+		_, _, err := r.client.VPS().DoJSON(ctx, http.MethodPatch, endpoint, patch, nil, http.StatusOK)
+		if err != nil {
+			detail := "Could not update VPS, unexpected error: " + err.Error()
+			if powerSensitivePatch {
+				detail += "\n\nIf you changed `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`, the VPS must be powered off."
+			}
+
+			resp.Diagnostics.AddError(
+				"Error updating VPS",
+				detail,
+			)
+			return
+		}
+	}
+
+	updated, err := r.client.VPS().Get(ctx, state.Identifier.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts VPS",
+			"Could not read VPS "+state.Identifier.String()+": "+err.Error(),
+		)
+		return
+	}
+
+	server, d := readServer(updated)
+	resp.Diagnostics.Append(d...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	diags = resp.State.Set(ctx, *server)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+
+func diskSizeFromSpecsObject(specs types.Object) (int64, bool) {
+	return specInt64FromSpecsObject(specs, "disk_size")
+}
+
+func specInt64FromSpecsObject(specs types.Object, key string) (int64, bool) {
+	if specs.IsNull() || specs.IsUnknown() {
+		return 0, false
+	}
+
+	specValue, exists := specs.Attributes()[key]
+	if !exists {
+		return 0, false
+	}
+
+	specAttr, ok := specValue.(types.Int64)
+	if !ok || specAttr.IsNull() || specAttr.IsUnknown() {
+		return 0, false
+	}
+
+	return specAttr.ValueInt64(), true
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
