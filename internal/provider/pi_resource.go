@@ -135,7 +135,7 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 			},
 			"nic_speed": schema.Int64Attribute{
 				Computed:            true,
-				MarkdownDescription: "CPU speed in MHz. Only used on creation. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
+				MarkdownDescription: "NIC speed in Mbps. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.",
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
