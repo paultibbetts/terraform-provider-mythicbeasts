@@ -82,7 +82,7 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 						"must consist only of alphanumerics and -",
 					),
 				},
-				MarkdownDescription: "A unique identifier for the server. This will form part of the hostname for the server, and must consist only of lower-case letters and digits and be at most 20 characters long",
+				MarkdownDescription: "A unique identifier for the server. This will form part of the hostname for the server, and should consist only of alphanumerics and `-`.",
 			},
 			"disk_size": schema.Int64Attribute{
 				Computed:            true,
