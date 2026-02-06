@@ -30,6 +30,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/paultibbetts/mythicbeasts-client-go"
+	mbVPS "github.com/paultibbetts/mythicbeasts-client-go/vps"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -451,7 +452,7 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	var VPS mythicbeasts.NewVPS
+	var VPS mbVPS.CreateRequest
 
 	identifier := plan.Identifier.ValueString()
 
@@ -489,9 +490,9 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 		}
 	}
 
-	data, err := r.client.CreateVPS(identifier, VPS)
+	data, err := r.client.VPS().Create(ctx, identifier, VPS)
 	if err != nil {
-		var identifierConflictErr *mythicbeasts.ErrIdentifierConflict
+		var identifierConflictErr *mbVPS.ErrIdentifierConflict
 		if errors.As(err, &identifierConflictErr) {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("identifier"),
@@ -517,7 +518,7 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 }
 
-func readServer(server mythicbeasts.VPS) (*VPSResourceModel, diag.Diagnostics) {
+func readServer(server mbVPS.Server) (*VPSResourceModel, diag.Diagnostics) {
 	var state VPSResourceModel
 	var diags diag.Diagnostics
 
@@ -641,7 +642,7 @@ func (r *VPSResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 	tflog.Info(ctx, fmt.Sprintf("reading %s", state.Identifier.ValueString()))
 
-	data, err := r.client.GetVPS(state.Identifier.ValueString())
+	data, err := r.client.VPS().Get(ctx, state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading Mythic Beasts VPS",
@@ -673,7 +674,7 @@ func (r *VPSResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	err := r.client.DeleteVPS(state.Identifier.ValueString())
+	err := r.client.VPS().Delete(ctx, state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting VPS",

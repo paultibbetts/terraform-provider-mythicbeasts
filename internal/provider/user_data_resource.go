@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/paultibbetts/mythicbeasts-client-go"
+	mbVPS "github.com/paultibbetts/mythicbeasts-client-go/vps"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -125,7 +126,7 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	var UserData mythicbeasts.NewUserData
+	var UserData mbVPS.NewUserData
 
 	UserData.Name = plan.Name.ValueString()
 	UserData.Data = plan.Data.ValueString()
@@ -141,7 +142,7 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 		}
 	}
 
-	_, err = r.client.CreateUserData(UserData)
+	_, err = r.client.VPS().CreateUserData(ctx, UserData)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating UserData",
@@ -150,7 +151,7 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	created, err := r.client.GetUserDataByName(plan.Name.ValueString())
+	created, err := r.client.VPS().GetUserDataByName(ctx, plan.Name.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating UserData",
@@ -182,7 +183,7 @@ func (r *UserDataResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	data, err := r.client.GetUserData(state.ID.ValueInt64())
+	data, err := r.client.VPS().GetUserData(ctx, state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading Mythic Beasts User Data",
@@ -216,7 +217,7 @@ func (r *UserDataResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	err := r.client.DeleteUserData(state.ID.ValueInt64())
+	err := r.client.VPS().DeleteUserData(ctx, state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting User Data",

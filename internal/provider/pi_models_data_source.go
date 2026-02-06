@@ -103,7 +103,7 @@ func (d *piModelsDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	var state piModelsDataSourceModel
 
-	piModels, err := d.client.GetPiModels()
+	piModels, err := d.client.Pi().ListModels(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Read Mythic Beasts Pi models",

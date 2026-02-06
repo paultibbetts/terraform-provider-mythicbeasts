@@ -104,7 +104,7 @@ func (d *VPSProductsDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	var state VPSProductsDataSourceModel
 
-	VPSProducts, err := d.client.GetVPSProducts()
+	VPSProducts, err := d.client.VPS().GetProducts(ctx, "")
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Read Mythic Beasts VPS disk sizes",

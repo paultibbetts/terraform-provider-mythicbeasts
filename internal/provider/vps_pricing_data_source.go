@@ -105,7 +105,7 @@ func (d *VPSPricingDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 
-	VPSPricing, err := d.client.GetVPSPricing()
+	VPSPricing, err := d.client.VPS().GetPricing(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Read Mythic Beasts VPS zones",

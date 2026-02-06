@@ -81,7 +81,7 @@ func (d *VPSZonesDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	var state VPSZonesDataSourceModel
 
-	VPSZones, err := d.client.GetVPSZones()
+	VPSZones, err := d.client.VPS().GetZones(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Read Mythic Beasts VPS zones",

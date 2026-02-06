@@ -8,10 +8,11 @@ terraform {
   }
 }
 
-provider "mythicbeasts" {}
-
-data "mythicbeasts_pi_models" "example" {}
-
-output "example" {
-  value = data.mythicbeasts_pi_models.example
+data "mythicbeasts_pi_operating_systems" "four" {
+  model = 4
 }
+
+output "os_for_model_four" {
+  value = data.mythicbeasts_pi_operating_systems.four
+}
+

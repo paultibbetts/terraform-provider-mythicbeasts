@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -26,6 +25,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/paultibbetts/mythicbeasts-client-go"
+	mbPi "github.com/paultibbetts/mythicbeasts-client-go/pi"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -141,18 +141,16 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				},
 			},
 			"os_image": schema.StringAttribute{
-				Computed:            true,
 				Optional:            true,
 				MarkdownDescription: "Operating system image",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplaceIfConfigured(),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"wait_for_dns": schema.BoolAttribute{
 				Computed:            true,
 				Optional:            true,
-				Default:             booldefault.StaticBool(false),
 				MarkdownDescription: "Whether to wait for DNS records under hostedpi.com to become available before completing provisioning.",
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.UseStateForUnknown(),
@@ -223,7 +221,7 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 		return
 	}
 
-	var Pi mythicbeasts.CreatePiRequest
+	var Pi mbPi.CreateRequest
 
 	identifier := plan.Identifier.ValueString()
 
@@ -251,9 +249,11 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 		Pi.OSImage = plan.OSImage.ValueString()
 	}
 
-	if !plan.WaitForDNS.IsNull() && !plan.WaitForDNS.IsUnknown() {
-		Pi.WaitForDNS = plan.WaitForDNS.ValueBool()
+	waitForDNS := false
+	if !config.WaitForDNS.IsNull() && !config.WaitForDNS.IsUnknown() {
+		waitForDNS = config.WaitForDNS.ValueBool()
 	}
+	Pi.WaitForDNS = waitForDNS
 
 	PiJSON, err := json.Marshal(Pi)
 	if err != nil {
@@ -269,9 +269,9 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 	}
 
 	// Create new server
-	server, err := r.client.CreatePi(identifier, Pi)
+	server, err := r.client.Pi().Create(ctx, identifier, Pi)
 	if err != nil {
-		var identifierConflictErr *mythicbeasts.ErrIdentifierConflict
+		var identifierConflictErr *mbPi.ErrIdentifierConflict
 		if errors.As(err, &identifierConflictErr) {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("identifier"),
@@ -305,11 +305,20 @@ func (r *PiResource) Create(ctx context.Context, req resource.CreateRequest, res
 	state.Memory = types.Int64Value(server.Memory)
 	state.CPUSpeed = types.Int64Value(server.CPUSpeed)
 	state.NICSpeed = types.Int64Value(server.NICSpeed)
-	state.IP = types.StringValue(server.IP)
+	ip, err := normalizeIPv6(server.IP)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error creating Pi server",
+			fmt.Sprintf("Could not create Pi server, invalid IPv6 address %q: %s", server.IP, err.Error()),
+		)
+		return
+	}
+	state.IP = types.StringValue(ip)
 	state.SSHPort = types.Int64Value(server.SSHPort)
 	state.DiskSize = types.Int64Value(int64(diskSize))
 	state.Location = types.StringValue(server.Location)
 	state.Model = types.Int64Value(server.Model)
+	state.WaitForDNS = types.BoolValue(waitForDNS)
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, &state)
@@ -328,7 +337,7 @@ func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 		return
 	}
 
-	server, err := r.client.GetPi(state.Identifier.ValueString())
+	server, err := r.client.Pi().Get(ctx, state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading Mythic Beasts Pi ",
@@ -353,7 +362,15 @@ func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 	state.Memory = types.Int64Value(server.Memory)
 	state.CPUSpeed = types.Int64Value(server.CPUSpeed)
 	state.NICSpeed = types.Int64Value(server.NICSpeed)
-	state.IP = types.StringValue(server.IP)
+	ip, err := normalizeIPv6(server.IP)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts Pi",
+			fmt.Sprintf("Could not read Pi %s, invalid IPv6 address %q: %s", state.Identifier.String(), server.IP, err.Error()),
+		)
+		return
+	}
+	state.IP = types.StringValue(ip)
 	state.SSHPort = types.Int64Value(server.SSHPort)
 	state.DiskSize = types.Int64Value(int64(diskSize))
 	state.Location = types.StringValue(server.Location)
@@ -379,7 +396,7 @@ func (r *PiResource) Delete(ctx context.Context, req resource.DeleteRequest, res
 		return
 	}
 
-	err := r.client.DeletePi(state.Identifier.ValueString())
+	err := r.client.Pi().Delete(ctx, state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting Pi ",

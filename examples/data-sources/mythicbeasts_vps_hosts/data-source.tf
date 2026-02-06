@@ -3,8 +3,7 @@ terraform {
 
   required_providers {
     mythicbeasts = {
-      source  = "paultibbetts.uk/terraform-providers/mythicbeasts"
-      version = "~> 0.2.0"
+      source = "paultibbetts/mythicbeasts"
     }
   }
 }
