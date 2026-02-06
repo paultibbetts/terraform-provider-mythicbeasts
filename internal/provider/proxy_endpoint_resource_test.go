@@ -67,6 +67,16 @@ func TestAccProxyEndpointResource(t *testing.T) {
 				},
 			},
 			{
+				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, proxyEndpointDomain, proxyEndpointHostname, proxyEndpointSite, false),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"mythicbeasts_proxy_endpoint.test",
+						tfjsonpath.New("proxy_protocol"),
+						knownvalue.Bool(false),
+					),
+				},
+			},
+			{
 				ResourceName:      "mythicbeasts_proxy_endpoint.test",
 				ImportState:       true,
 				ImportStateVerify: true,
