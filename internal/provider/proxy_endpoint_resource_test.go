@@ -47,7 +47,7 @@ func TestAccProxyEndpointResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
 						tfjsonpath.New("proxy_protocol"),
-						knownvalue.BoolExact(false),
+						knownvalue.Bool(false),
 					),
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
@@ -62,7 +62,7 @@ func TestAccProxyEndpointResource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
 						tfjsonpath.New("proxy_protocol"),
-						knownvalue.BoolExact(true),
+						knownvalue.Bool(true),
 					),
 				},
 			},

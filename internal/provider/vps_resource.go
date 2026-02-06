@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -120,7 +121,6 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 		Attributes: map[string]schema.Attribute{
 			"identifier": schema.StringAttribute{
 				Required: true,
-				// needs a validator
 				// can only be between 3 and 20 characters long
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -136,12 +136,22 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 			},
 			"product": schema.StringAttribute{
 				Required: true,
-				// needs a validator
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`^\S+$`),
+						"must not be empty or contain whitespace",
+					),
+				},
 				MarkdownDescription: "Virtual server product code; see the `mythicbeasts_vps_products` data source for valid values",
 			},
 			"name": schema.StringAttribute{
 				Required: true,
-				// needs a validator
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`\S`),
+						"must not be empty or whitespace",
+					),
+				},
 			},
 			"hostname": schema.StringAttribute{
 				Optional:            true,
@@ -166,6 +176,9 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Required:            true,
 				WriteOnly:           true,
 				MarkdownDescription: "Disk size, in MB; see the `mythicbeasts_vps_disk_sizes` data source for valid values",
+				Validators: []validator.Int64{
+					int64validator.AtLeast(1),
+				},
 			},
 			"image": schema.StringAttribute{
 				Required:            true,
@@ -205,6 +218,9 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Computed: true,
 				Optional: true,
 				Default:  stringdefault.StaticString("performance"),
+				Validators: []validator.String{
+					stringvalidator.OneOf("performance", "compatibility"),
+				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 					stringplanmodifier.RequiresReplace(),
@@ -215,6 +231,9 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Computed: true,
 				Optional: true,
 				Default:  stringdefault.StaticString("virtio"),
+				Validators: []validator.String{
+					stringvalidator.OneOf("virtio", "e1000", "rtl8139", "ne2k_pci"),
+				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 					stringplanmodifier.RequiresReplace(),
@@ -225,6 +244,9 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Computed: true,
 				Optional: true,
 				Default:  stringdefault.StaticString("virtio"),
+				Validators: []validator.String{
+					stringvalidator.OneOf("virtio", "sata", "scsi", "ide"),
+				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 					stringplanmodifier.RequiresReplace(),
