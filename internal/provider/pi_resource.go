@@ -149,10 +149,11 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				},
 			},
 			"wait_for_dns": schema.BoolAttribute{
-				Computed:            true,
 				Optional:            true,
+				WriteOnly:           true,
 				MarkdownDescription: "Whether to wait for DNS records under hostedpi.com to become available before completing provisioning.",
 				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplace(),
 					boolplanmodifier.UseStateForUnknown(),
 				},
 			},
