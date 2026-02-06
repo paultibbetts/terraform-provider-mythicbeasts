@@ -15,6 +15,8 @@ import (
 
 var testAccUserData = "#cloud-config\n\npackages:\n  - apache2\n\n"
 var testAccUserDataSize = int64(len(testAccUserData))
+var testAccUserDataUpdated = "#cloud-config\n\npackages:\n  - nginx\n\n"
+var testAccUserDataUpdatedSize = int64(len(testAccUserDataUpdated))
 
 func TestAccUserDataResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -23,7 +25,7 @@ func TestAccUserDataResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccUserDataResourceConfig("web-server"),
+				Config: testAccUserDataResourceConfig("web-server", testAccUserData),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_user_data.web-server",
@@ -54,17 +56,36 @@ func TestAccUserDataResource(t *testing.T) {
 				ImportStateVerify: true,
 			},
 			// Update and Read testing
-			//{},
+			{
+				Config: testAccUserDataResourceConfig("web-server", testAccUserDataUpdated),
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"mythicbeasts_user_data.web-server",
+						tfjsonpath.New("name"),
+						knownvalue.StringExact("web-server"),
+					),
+					statecheck.ExpectKnownValue(
+						"mythicbeasts_user_data.web-server",
+						tfjsonpath.New("data"),
+						knownvalue.StringExact(testAccUserDataUpdated),
+					),
+					statecheck.ExpectKnownValue(
+						"mythicbeasts_user_data.web-server",
+						tfjsonpath.New("size"),
+						knownvalue.Int64Exact(testAccUserDataUpdatedSize),
+					),
+				},
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})
 }
 
-func testAccUserDataResourceConfig(name string) string {
+func testAccUserDataResourceConfig(name, data string) string {
 	return fmt.Sprintf(`
 resource "mythicbeasts_user_data" %[1]q {
   name           = %[1]q
-  data      = "#cloud-config\n\npackages:\n  - apache2\n\n"
+  data           = %[2]q
 }
-`, name)
+`, name, data)
 }

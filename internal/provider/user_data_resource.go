@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -19,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/paultibbetts/mythicbeasts-client-go"
 	mbVPS "github.com/paultibbetts/mythicbeasts-client-go/vps"
 )
@@ -73,6 +71,9 @@ func (r *UserDataResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 						regexp.MustCompile(`\S`),
 						"must not be empty or whitespace",
 					),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"data": schema.StringAttribute{
@@ -141,31 +142,11 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 	UserData.Name = plan.Name.ValueString()
 	UserData.Data = plan.Data.ValueString()
 
-	UserDataJSON, err := json.Marshal(UserData)
-	if err != nil {
-		tflog.Warn(ctx, "Failed to marshal User Data for logging", map[string]interface{}{"error": err.Error()})
-	} else {
-		var UserDataMap map[string]any
-		err = json.Unmarshal(UserDataJSON, &UserDataMap)
-		if err != nil {
-			tflog.Warn(ctx, "Failed to unmarshal UserData JSON for logging", map[string]any{"error": err.Error()})
-		}
-	}
-
-	_, err = r.client.VPS().CreateUserData(ctx, UserData)
+	created, err := r.client.VPS().CreateUserData(ctx, UserData)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating UserData",
 			"Could not create UserData, unexpected error: "+err.Error(),
-		)
-		return
-	}
-
-	created, err := r.client.VPS().GetUserDataByName(ctx, plan.Name.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error creating UserData",
-			"Could not create UserData, could not fetch the created resource:"+err.Error(),
 		)
 		return
 	}
@@ -216,6 +197,61 @@ func (r *UserDataResource) Read(ctx context.Context, req resource.ReadRequest, r
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *UserDataResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan UserDataResourceModel
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state UserDataResourceModel
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if plan.Data.IsNull() || plan.Data.IsUnknown() {
+		resp.Diagnostics.AddError(
+			"Missing user data snippet",
+			"`data` must be set to update a User Data resource.",
+		)
+		return
+	}
+
+	if plan.Data.ValueString() != state.Data.ValueString() {
+		requestBody := mbVPS.UpdateUserData{
+			Data: plan.Data.ValueString(),
+		}
+		err := r.client.VPS().UpdateUserData(ctx, state.ID.ValueInt64(), requestBody)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Error updating User Data",
+				"Could not update User Data, unexpected error: "+err.Error(),
+			)
+			return
+		}
+	}
+
+	updated, err := r.client.VPS().GetUserData(ctx, state.ID.ValueInt64())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts User Data",
+			fmt.Sprintf("Could not read User Data %d: %s", state.ID.ValueInt64(), err.Error()),
+		)
+		return
+	}
+
+	state.ID = types.Int64Value(updated.ID)
+	state.Name = types.StringValue(updated.Name)
+	state.Data = types.StringValue(updated.Data)
+	state.Size = types.Int64Value(updated.Size)
+
+	diags = resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
