@@ -99,6 +99,7 @@ Changing this setting via the API requires the VPS to be powered off.
 Default: `false`
 - `set_reverse_dns` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether to automatically set reverse DNS for the server's IP addresses to the selected hostname
 Default: `false`
+- `specs` (Attributes) Server specs (see [below for nested schema](#nestedatt--specs))
 - `ssh_proxy` (Attributes) SSH Proxy settings (for IPv4 access to IPv6-only servers) (see [below for nested schema](#nestedatt--ssh_proxy))
 - `tablet` (Boolean) Tablet mode for VNC mouse pointer
 Default: `true`
@@ -117,8 +118,23 @@ Changing this setting via the API requires the VPS to be powered off.
 - `macs` (List of String) List of MAC addresses
 - `period` (String) Billing period
 - `price` (Number) Price of server (pence per billing period)
-- `specs` (Attributes) Server specs (see [below for nested schema](#nestedatt--specs))
 - `zone` (Attributes) Zone (datacentre) (see [below for nested schema](#nestedatt--zone))
+
+<a id="nestedatt--specs"></a>
+### Nested Schema for `specs`
+
+Optional:
+
+- `disk_size` (Number) Disk size in MB
+- `extra_cores` (Number) Number of CPU cores in addition to the ones provided by the base product (private cloud only)
+- `extra_ram` (Number) Amount of RAM (in MB) in addition to the RAM provided by the base product (private cloud only)
+
+Read-Only:
+
+- `cores` (Number) Number of virtual CPU cores
+- `disk_type` (String) Disk type
+- `ram` (Number) RAM size in MB
+
 
 <a id="nestedatt--ssh_proxy"></a>
 ### Nested Schema for `ssh_proxy`
@@ -143,22 +159,6 @@ Read-Only:
 - `ipv4` (String) VNC IPv4 address
 - `ipv6` (String) VNC IPv6 address
 - `port` (Number) VNC port number
-
-
-<a id="nestedatt--specs"></a>
-### Nested Schema for `specs`
-
-Optional:
-
-- `disk_size` (Number) Disk size in MB
-- `extra_cores` (Number) Number of CPU cores in addition to the ones provided by the base product (private cloud only)
-- `extra_ram` (Number) Amount of RAM (in MB) in addition to the RAM provided by the base product (private cloud only)
-
-Read-Only:
-
-- `cores` (Number) Number of virtual CPU cores
-- `disk_type` (String) Disk type
-- `ram` (Number) RAM size in MB
 
 
 <a id="nestedatt--zone"></a>
