@@ -100,9 +100,6 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				Optional:            true,
 				WriteOnly:           true,
 				MarkdownDescription: "Public SSH key(s) to be added to /root/.ssh/authorized_keys on server",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"model": schema.Int64Attribute{
 				Computed: true,
@@ -386,6 +383,75 @@ func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *PiResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var state PiResourceModel
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var config PiResourceModel
+	diags = req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if !config.SSHKey.IsNull() && !config.SSHKey.IsUnknown() {
+		requestBody := mbPi.UpdateSSHKeyRequest{
+			SSHKey: config.SSHKey.ValueString(),
+		}
+
+		_, err := r.client.Pi().UpdateSSHKey(ctx, state.Identifier.ValueString(), requestBody)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Error updating Pi SSH key",
+				"Could not update Pi SSH key, unexpected error: "+err.Error(),
+			)
+			return
+		}
+	}
+
+	server, err := r.client.Pi().Get(ctx, state.Identifier.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts Pi",
+			"Could not read Pi "+state.Identifier.String()+": "+err.Error(),
+		)
+		return
+	}
+
+	diskSize, err := strconv.ParseFloat(server.DiskSize, 64)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts Pi",
+			"Could not read Pi, unexpected error converting disk size: "+err.Error(),
+		)
+		return
+	}
+
+	state.Memory = types.Int64Value(server.Memory)
+	state.CPUSpeed = types.Int64Value(server.CPUSpeed)
+	state.NICSpeed = types.Int64Value(server.NICSpeed)
+	ip, err := normalizeIPv6(server.IP)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts Pi",
+			fmt.Sprintf("Could not read Pi %s, invalid IPv6 address %q: %s", state.Identifier.String(), server.IP, err.Error()),
+		)
+		return
+	}
+	state.IP = types.StringValue(ip)
+	state.SSHPort = types.Int64Value(server.SSHPort)
+	state.DiskSize = types.Int64Value(int64(diskSize))
+	state.Location = types.StringValue(server.Location)
+	state.Model = types.Int64Value(server.Model)
+
+	diags = resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 // Delete deletes the resource and removes the Terraform state on success.

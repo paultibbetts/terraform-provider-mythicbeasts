@@ -14,6 +14,8 @@ import (
 )
 
 const piIdentifier = "tfprovidertest6"
+const piSSHKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e"
+const piSSHKeyUpdated = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB5Y6QFrfcJw0f0D8uG2D8btJQH8k8K6Pp9g8b0Xv2zL"
 
 func TestAccPiResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -22,7 +24,7 @@ func TestAccPiResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccPiResourceConfig(piIdentifier),
+				Config: testAccPiResourceConfig(piIdentifier, piSSHKey),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_pi."+piIdentifier,
@@ -65,7 +67,7 @@ func TestAccPiResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccPiResourceConfig(piIdentifier),
+				Config: testAccPiResourceConfig(piIdentifier, piSSHKeyUpdated),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_pi."+piIdentifier,
@@ -99,16 +101,16 @@ func TestAccPiResource(t *testing.T) {
 	})
 }
 
-func testAccPiResourceConfig(identifier string) string {
+func testAccPiResourceConfig(identifier string, sshKey string) string {
 	return fmt.Sprintf(`
 resource "mythicbeasts_pi" %[1]q {
   identifier   = %[1]q
   disk_size    = 10
   model        = 4
   os_image     = "rpi-bookworm-arm64"
-  ssh_key      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e code@paultibbetts.uk"
+  ssh_key      = %[2]q
   wait_for_dns = true
   memory       = 4096
 }
-`, identifier)
+`, identifier, sshKey)
 }

@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -120,7 +120,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Manages a Mythic Beasts VPS.\n\n" +
 			"In-place updates are supported for `product`, `name`, `disk_size`, `specs.extra_cores`, `specs.extra_ram`, `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, and `tablet`.\n\n" +
-			"The Mythic Beasts API requires the VPS to be powered off before changing `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`. Automatic power-state orchestration is not currently supported.",
+			"The Mythic Beasts API requires the VPS to be powered off before changing `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`. The provider automatically powers off a running VPS before applying these changes and powers it back on afterwards.",
 		Attributes: map[string]schema.Attribute{
 			"identifier": schema.StringAttribute{
 				Required: true,
@@ -543,7 +543,7 @@ func (r *VPSResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 
 	if !plan.Tablet.IsNull() && !plan.Tablet.IsUnknown() {
-		VPS.Tablet = plan.Tablet.ValueBool()
+		VPS.SetTablet(plan.Tablet.ValueBool())
 	}
 
 	if extraCores, ok := specInt64FromSpecsObject(plan.Specs, "extra_cores"); ok {
@@ -762,78 +762,76 @@ func (r *VPSResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	patch := make(map[string]any)
-	hasPatch := false
-	powerSensitivePatch := false
+	updateReq := mbVPS.NewUpdateRequest()
+	hasUpdate := false
 
 	if plan.Product.ValueString() != state.Product.ValueString() {
-		patch["product"] = plan.Product.ValueString()
-		hasPatch = true
+		updateReq.SetProduct(plan.Product.ValueString())
+		hasUpdate = true
 	}
 
 	if plan.Name.ValueString() != state.Name.ValueString() {
-		patch["name"] = plan.Name.ValueString()
-		hasPatch = true
+		updateReq.SetName(plan.Name.ValueString())
+		hasUpdate = true
 	}
 
 	if !plan.BootDevice.IsNull() && !plan.BootDevice.IsUnknown() && plan.BootDevice.ValueString() != state.BootDevice.ValueString() {
-		patch["boot_device"] = plan.BootDevice.ValueString()
-		hasPatch = true
-		powerSensitivePatch = true
+		updateReq.SetBootDevice(plan.BootDevice.ValueString())
+		hasUpdate = true
 	}
 
 	if !plan.CPUMode.IsNull() && !plan.CPUMode.IsUnknown() && plan.CPUMode.ValueString() != state.CPUMode.ValueString() {
-		patch["cpu_mode"] = plan.CPUMode.ValueString()
-		hasPatch = true
-		powerSensitivePatch = true
+		updateReq.SetCPUMode(plan.CPUMode.ValueString())
+		hasUpdate = true
 	}
 
 	if !plan.NetDevice.IsNull() && !plan.NetDevice.IsUnknown() && plan.NetDevice.ValueString() != state.NetDevice.ValueString() {
-		patch["net_device"] = plan.NetDevice.ValueString()
-		hasPatch = true
-		powerSensitivePatch = true
+		updateReq.SetNetDevice(plan.NetDevice.ValueString())
+		hasUpdate = true
 	}
 
 	if !plan.DiskBus.IsNull() && !plan.DiskBus.IsUnknown() && plan.DiskBus.ValueString() != state.DiskBus.ValueString() {
-		patch["disk_bus"] = plan.DiskBus.ValueString()
-		hasPatch = true
-		powerSensitivePatch = true
+		updateReq.SetDiskBus(plan.DiskBus.ValueString())
+		hasUpdate = true
 	}
 
 	if !plan.Tablet.IsNull() && !plan.Tablet.IsUnknown() && plan.Tablet.ValueBool() != state.Tablet.ValueBool() {
-		patch["tablet"] = plan.Tablet.ValueBool()
-		hasPatch = true
-		powerSensitivePatch = true
+		updateReq.SetTablet(plan.Tablet.ValueBool())
+		hasUpdate = true
 	}
 
-	specsPatch := map[string]any{}
+	specsUpdate := mbVPS.NewUpdateSpecs()
+	hasSpecsUpdate := false
 
 	if !config.DiskSize.IsNull() && !config.DiskSize.IsUnknown() {
 		desiredDiskSize := config.DiskSize.ValueInt64()
 		currentDiskSize, hasCurrentDiskSize := diskSizeFromSpecsObject(state.Specs)
 
 		if !hasCurrentDiskSize || desiredDiskSize != currentDiskSize {
-			specsPatch["disk_size"] = desiredDiskSize
+			specsUpdate.SetDiskSize(desiredDiskSize)
+			hasSpecsUpdate = true
 		}
 	}
 
 	if desiredExtraCores, ok := specInt64FromSpecsObject(plan.Specs, "extra_cores"); ok {
 		currentExtraCores, hasCurrentExtraCores := specInt64FromSpecsObject(state.Specs, "extra_cores")
 		if !hasCurrentExtraCores || desiredExtraCores != currentExtraCores {
-			specsPatch["extra_cores"] = desiredExtraCores
+			specsUpdate.SetExtraCores(desiredExtraCores)
+			hasSpecsUpdate = true
 		}
 	}
 
 	if desiredExtraRAM, ok := specInt64FromSpecsObject(plan.Specs, "extra_ram"); ok {
 		currentExtraRAM, hasCurrentExtraRAM := specInt64FromSpecsObject(state.Specs, "extra_ram")
 		if !hasCurrentExtraRAM || desiredExtraRAM != currentExtraRAM {
-			specsPatch["extra_ram"] = desiredExtraRAM
+			specsUpdate.SetExtraRAM(desiredExtraRAM)
+			hasSpecsUpdate = true
 		}
 	}
 
-	if len(specsPatch) > 0 {
-		patch["specs"] = specsPatch
-		hasPatch = true
+	if hasSpecsUpdate {
+		updateReq.SetSpecs(specsUpdate)
+		hasUpdate = true
 	}
 
 	if !plan.ISOImage.IsUnknown() {
@@ -844,24 +842,49 @@ func (r *VPSResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 		if plan.ISOImage.IsNull() {
 			if currentISOImage != "" {
-				patch["iso_image"] = nil
-				hasPatch = true
-				powerSensitivePatch = true
+				updateReq.ClearISOImage()
+				hasUpdate = true
 			}
 		} else if plan.ISOImage.ValueString() != currentISOImage {
-			patch["iso_image"] = plan.ISOImage.ValueString()
-			hasPatch = true
-			powerSensitivePatch = true
+			updateReq.SetISOImage(plan.ISOImage.ValueString())
+			hasUpdate = true
 		}
 	}
 
-	if hasPatch {
-		endpoint := fmt.Sprintf("/vps/servers/%s", state.Identifier.ValueString())
-		_, _, err := r.client.VPS().DoJSON(ctx, http.MethodPatch, endpoint, patch, nil, http.StatusOK)
+	if hasUpdate {
+		requiresPoweredOff := updateReq.RequiresPoweredOff()
+		shouldPowerOnAfter := false
+
+		if requiresPoweredOff {
+			currentServer, err := r.client.VPS().Get(ctx, state.Identifier.ValueString())
+			if err != nil {
+				resp.Diagnostics.AddError(
+					"Error reading Mythic Beasts VPS",
+					"Could not read VPS "+state.Identifier.String()+": "+err.Error(),
+				)
+				return
+			}
+
+			if strings.EqualFold(currentServer.Status, "running") {
+				_, err = r.client.VPS().SetPower(ctx, state.Identifier.ValueString(), mbVPS.PowerActionOff)
+				if err != nil {
+					resp.Diagnostics.AddError(
+						"Error powering off VPS",
+						"Could not power off VPS before update, unexpected error: "+err.Error(),
+					)
+					return
+				}
+				shouldPowerOnAfter = true
+			}
+		}
+
+		_, err := r.client.VPS().Update(ctx, state.Identifier.ValueString(), updateReq)
 		if err != nil {
 			detail := "Could not update VPS, unexpected error: " + err.Error()
-			if powerSensitivePatch {
-				detail += "\n\nIf you changed `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`, the VPS must be powered off."
+			if shouldPowerOnAfter {
+				if _, powerErr := r.client.VPS().SetPower(ctx, state.Identifier.ValueString(), mbVPS.PowerActionOn); powerErr != nil {
+					detail += "\n\nThe provider also failed to power the VPS back on: " + powerErr.Error()
+				}
 			}
 
 			resp.Diagnostics.AddError(
@@ -869,6 +892,17 @@ func (r *VPSResource) Update(ctx context.Context, req resource.UpdateRequest, re
 				detail,
 			)
 			return
+		}
+
+		if shouldPowerOnAfter {
+			_, err = r.client.VPS().SetPower(ctx, state.Identifier.ValueString(), mbVPS.PowerActionOn)
+			if err != nil {
+				resp.Diagnostics.AddError(
+					"Error powering on VPS",
+					"The VPS was updated, but powering it back on failed: "+err.Error(),
+				)
+				return
+			}
 		}
 	}
 
