@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	proxyEndpointPiIdentifier = "tfprovidertest-proxy-endpoint"
+	proxyEndpointPiIdentifier = "tfprovproxyendpoint"
 	proxyEndpointDomain       = "example.com"
 	proxyEndpointHostname     = "example"
 	proxyEndpointSite         = "all"
