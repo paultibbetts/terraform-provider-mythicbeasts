@@ -13,8 +13,22 @@ description: |-
 ## Example Usage
 
 ```terraform
+terraform {
+  required_version = ">= 1.3.0"
+
+  required_providers {
+    mythicbeasts = {
+      source = "paultibbetts/mythicbeasts"
+    }
+  }
+}
+
 provider "mythicbeasts" {
-  # example configuration here
+  # Leave unset to use environment variables:
+  # MYTHICBEASTS_KEYID and MYTHICBEASTS_SECRET
+  #
+  # keyid  = "your-keyid"
+  # secret = "your-secret"
 }
 ```
 
