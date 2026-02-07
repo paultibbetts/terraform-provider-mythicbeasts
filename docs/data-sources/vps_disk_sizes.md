@@ -35,8 +35,8 @@ output "all_disk_sizes" {
 
 ### Read-Only
 
-- `hdd` (Attributes Set) (see [below for nested schema](#nestedatt--hdd))
-- `ssd` (Attributes Set) (see [below for nested schema](#nestedatt--ssd))
+- `hdd` (Attributes List) (see [below for nested schema](#nestedatt--hdd))
+- `ssd` (Attributes List) (see [below for nested schema](#nestedatt--ssd))
 
 <a id="nestedatt--hdd"></a>
 ### Nested Schema for `hdd`

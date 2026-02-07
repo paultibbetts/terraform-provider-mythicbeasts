@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   Manages a Mythic Beasts VPS.
   In-place updates are supported for product, name, disk_size, specs.extra_cores, specs.extra_ram, iso_image, boot_device, cpu_mode, net_device, disk_bus, and tablet.
-  The Mythic Beasts API requires the VPS to be powered off before changing iso_image, boot_device, cpu_mode, net_device, disk_bus, or tablet. Automatic power-state orchestration is not currently supported.
+  The Mythic Beasts API requires the VPS to be powered off before changing iso_image, boot_device, cpu_mode, net_device, disk_bus, or tablet. The provider automatically powers off a running VPS before applying these changes and powers it back on afterwards.
 ---
 
 # mythicbeasts_vps (Resource)
@@ -14,7 +14,7 @@ Manages a Mythic Beasts VPS.
 
 In-place updates are supported for `product`, `name`, `disk_size`, `specs.extra_cores`, `specs.extra_ram`, `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, and `tablet`.
 
-The Mythic Beasts API requires the VPS to be powered off before changing `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`. Automatic power-state orchestration is not currently supported.
+The Mythic Beasts API requires the VPS to be powered off before changing `iso_image`, `boot_device`, `cpu_mode`, `net_device`, `disk_bus`, or `tablet`. The provider automatically powers off a running VPS before applying these changes and powers it back on afterwards.
 
 ## Example Usage
 

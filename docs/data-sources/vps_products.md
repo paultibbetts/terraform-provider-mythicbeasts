@@ -47,3 +47,13 @@ Read-Only:
 - `family` (String)
 - `name` (String)
 - `period` (String)
+- `specs` (Attributes) (see [below for nested schema](#nestedatt--products--specs))
+
+<a id="nestedatt--products--specs"></a>
+### Nested Schema for `products.specs`
+
+Read-Only:
+
+- `bandwidth` (Number)
+- `cores` (Number)
+- `ram` (Number)

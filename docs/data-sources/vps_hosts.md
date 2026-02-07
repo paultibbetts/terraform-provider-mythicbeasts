@@ -42,7 +42,7 @@ output "hosts" {
 
 Read-Only:
 
-- `cores` (String)
+- `cores` (Number)
 - `disk` (Attributes) (see [below for nested schema](#nestedatt--hosts--disk))
 - `free_disk` (Attributes) (see [below for nested schema](#nestedatt--hosts--free_disk))
 - `free_ram` (Number)
