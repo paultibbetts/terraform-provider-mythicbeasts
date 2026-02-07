@@ -866,11 +866,11 @@ func (r *VPSResource) Update(ctx context.Context, req resource.UpdateRequest, re
 			}
 
 			if strings.EqualFold(currentServer.Status, "running") {
-				_, err = r.client.VPS().SetPower(ctx, state.Identifier.ValueString(), mbVPS.PowerActionOff)
+				_, err = r.client.VPS().ShutdownWithGrace(ctx, state.Identifier.ValueString(), 0)
 				if err != nil {
 					resp.Diagnostics.AddError(
-						"Error powering off VPS",
-						"Could not power off VPS before update, unexpected error: "+err.Error(),
+						"Error shutting down VPS",
+						"Could not gracefully shut down VPS before update, unexpected error: "+err.Error(),
 					)
 					return
 				}
