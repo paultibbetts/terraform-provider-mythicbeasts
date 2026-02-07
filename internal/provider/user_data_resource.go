@@ -151,12 +151,28 @@ func (r *UserDataResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	var state UserDataResourceModel
+	if created.ID == 0 {
+		resp.Diagnostics.AddError(
+			"Error creating UserData",
+			"Could not create UserData, API response did not include a valid ID.",
+		)
+		return
+	}
 
-	state.Name = types.StringValue(created.Name)
-	state.Data = types.StringValue(created.Data)
-	state.ID = types.Int64Value(created.ID)
-	state.Size = types.Int64Value(created.Size)
+	createdData, err := r.client.VPS().GetUserData(ctx, created.ID)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading Mythic Beasts User Data",
+			fmt.Sprintf("Could not read User Data %d after create: %s", created.ID, err.Error()),
+		)
+		return
+	}
+
+	var state UserDataResourceModel
+	state.Name = types.StringValue(createdData.Name)
+	state.Data = types.StringValue(createdData.Data)
+	state.ID = types.Int64Value(createdData.ID)
+	state.Size = types.Int64Value(createdData.Size)
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
