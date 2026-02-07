@@ -100,6 +100,12 @@ func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				Optional:            true,
 				WriteOnly:           true,
 				MarkdownDescription: "Public SSH key(s) to be added to /root/.ssh/authorized_keys on server",
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						regexp.MustCompile(`\S`),
+						"must not be empty or whitespace",
+					),
+				},
 			},
 			"model": schema.Int64Attribute{
 				Computed: true,
