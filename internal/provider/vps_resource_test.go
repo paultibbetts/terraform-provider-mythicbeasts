@@ -13,9 +13,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-const identifier = "tfprovidertest15"
-
 func TestAccVPSResource(t *testing.T) {
+	identifier := testAccIdentifier("tfvps", 20)
+	resourceAddress := "mythicbeasts_vps." + identifier
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -25,29 +26,29 @@ func TestAccVPSResource(t *testing.T) {
 				Config: testAccVPSResourceConfig(identifier),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("identifier"),
 						knownvalue.StringExact(identifier),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("cpu_mode"),
 						knownvalue.StringExact("performance"),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("zone"),
 						knownvalue.ObjectPartial(map[string]knownvalue.Check{
 							"code": knownvalue.NotNull(),
 						}),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("ipv4"),
 						knownvalue.SetSizeExact(0),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("product"),
 						knownvalue.StringExact("VPSX4"),
 					),
@@ -55,7 +56,7 @@ func TestAccVPSResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:                         "mythicbeasts_vps." + identifier,
+				ResourceName:                         resourceAddress,
 				ImportState:                          true,
 				ImportStateVerify:                    true,
 				ImportStateId:                        identifier,
@@ -66,34 +67,34 @@ func TestAccVPSResource(t *testing.T) {
 				Config: testAccVPSResourceConfig(identifier),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("identifier"),
 						knownvalue.StringExact(identifier),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("name"),
 						knownvalue.StringExact(identifier),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("disk_bus"),
 						knownvalue.StringExact("virtio"),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("zone"),
 						knownvalue.ObjectPartial(map[string]knownvalue.Check{
 							"code": knownvalue.NotNull(),
 						}),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("ipv4"),
 						knownvalue.SetSizeExact(0),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_vps."+identifier,
+						resourceAddress,
 						tfjsonpath.New("product"),
 						knownvalue.StringExact("VPSX4"),
 					),

@@ -5,6 +5,7 @@ package provider
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -15,24 +16,26 @@ import (
 )
 
 const (
-	proxyEndpointPiIdentifier = "tfprovproxyendpoint2"
-	proxyEndpointDomain       = "example.com"
 	proxyEndpointHostname     = "example"
 	proxyEndpointSite         = "all"
+	proxyEndpointDomainEnvVar = "MB_TEST_PROXY_DOMAIN"
 )
 
 func TestAccProxyEndpointResource(t *testing.T) {
+	proxyEndpointPiIdentifier := testAccIdentifier("tfpx", 20)
+	domain := testAccProxyEndpointDomain(t)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, proxyEndpointDomain, proxyEndpointHostname, proxyEndpointSite, false),
+				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, domain, proxyEndpointHostname, proxyEndpointSite, false),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
 						tfjsonpath.New("domain"),
-						knownvalue.StringExact(proxyEndpointDomain),
+						knownvalue.StringExact(domain),
 					),
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
@@ -57,7 +60,7 @@ func TestAccProxyEndpointResource(t *testing.T) {
 				},
 			},
 			{
-				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, proxyEndpointDomain, proxyEndpointHostname, proxyEndpointSite, true),
+				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, domain, proxyEndpointHostname, proxyEndpointSite, true),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
@@ -67,7 +70,7 @@ func TestAccProxyEndpointResource(t *testing.T) {
 				},
 			},
 			{
-				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, proxyEndpointDomain, proxyEndpointHostname, proxyEndpointSite, false),
+				Config: testAccProxyEndpointResourceConfig(proxyEndpointPiIdentifier, domain, proxyEndpointHostname, proxyEndpointSite, false),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"mythicbeasts_proxy_endpoint.test",
@@ -99,6 +102,17 @@ func TestAccProxyEndpointResource(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccProxyEndpointDomain(t *testing.T) string {
+	t.Helper()
+
+	domain := os.Getenv(proxyEndpointDomainEnvVar)
+	if domain == "" {
+		t.Skipf("set %s to run proxy endpoint acceptance tests", proxyEndpointDomainEnvVar)
+	}
+
+	return domain
 }
 
 func testAccProxyEndpointResourceConfig(identifier, domain, hostname, site string, proxyProtocol bool) string {

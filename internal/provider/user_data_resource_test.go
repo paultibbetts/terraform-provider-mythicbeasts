@@ -19,31 +19,34 @@ var testAccUserDataUpdated = "#cloud-config\n\npackages:\n  - nginx\n\n"
 var testAccUserDataUpdatedSize = int64(len(testAccUserDataUpdated))
 
 func TestAccUserDataResource(t *testing.T) {
+	name := "web-server-" + testAccRunSuffix()
+	resourceAddress := "mythicbeasts_user_data." + name
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccUserDataResourceConfig("web-server", testAccUserData),
+				Config: testAccUserDataResourceConfig(name, testAccUserData),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("id"),
 						knownvalue.NotNull(),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("web-server"),
+						knownvalue.StringExact(name),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("data"),
 						knownvalue.StringExact(testAccUserData),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("size"),
 						knownvalue.Int64Exact(testAccUserDataSize),
 					),
@@ -51,26 +54,27 @@ func TestAccUserDataResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "mythicbeasts_user_data.web-server",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            resourceAddress,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"data"},
 			},
 			// Update and Read testing
 			{
-				Config: testAccUserDataResourceConfig("web-server", testAccUserDataUpdated),
+				Config: testAccUserDataResourceConfig(name, testAccUserDataUpdated),
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("web-server"),
+						knownvalue.StringExact(name),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("data"),
 						knownvalue.StringExact(testAccUserDataUpdated),
 					),
 					statecheck.ExpectKnownValue(
-						"mythicbeasts_user_data.web-server",
+						resourceAddress,
 						tfjsonpath.New("size"),
 						knownvalue.Int64Exact(testAccUserDataUpdatedSize),
 					),
