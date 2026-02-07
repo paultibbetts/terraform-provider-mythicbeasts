@@ -89,9 +89,6 @@ func (r *UserDataResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 			"size": schema.Int64Attribute{
 				Computed:            true,
 				MarkdownDescription: "User data size (in bytes)",
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
 			},
 		},
 	}

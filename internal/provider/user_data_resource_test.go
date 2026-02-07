@@ -54,10 +54,9 @@ func TestAccUserDataResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            resourceAddress,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"data"},
+				ResourceName:      resourceAddress,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update and Read testing
 			{
