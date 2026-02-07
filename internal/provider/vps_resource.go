@@ -190,9 +190,8 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				MarkdownDescription: "Operating system image name; see the `mythicbeasts_vps_images` data source for valid values",
 			},
 			"user_data": schema.StringAttribute{
-				Optional:  true,
-				WriteOnly: true,
-				// TODO not a datasource
+				Optional:            true,
+				WriteOnly:           true,
 				MarkdownDescription: "Stored user data ID or name; see the `mythicbeasts_user_data` resource for valid values",
 			},
 			"user_data_string": schema.StringAttribute{
