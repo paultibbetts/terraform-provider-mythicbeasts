@@ -34,11 +34,11 @@ type VPSProductsDataSourceModel struct {
 }
 
 type VPSProductModel struct {
-	Name        types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-	Code        types.String `tfsdk:"code"`
-	Family      types.String `tfsdk:"family"`
-	Period      types.String `tfsdk:"period"`
+	Name        types.String         `tfsdk:"name"`
+	Description types.String         `tfsdk:"description"`
+	Code        types.String         `tfsdk:"code"`
+	Family      types.String         `tfsdk:"family"`
+	Period      types.String         `tfsdk:"period"`
 	Specs       VPSProductSpecsModel `tfsdk:"specs"`
 }
 

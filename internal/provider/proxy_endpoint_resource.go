@@ -220,10 +220,10 @@ func (r *ProxyEndpointResource) Create(ctx context.Context, req resource.CreateR
 
 	endpoint := endpoints[0]
 	state := ProxyEndpointResourceModel{
-		ID:            types.StringValue(fmt.Sprintf("%s/%s/%s/%s", endpoint.Domain, endpoint.Hostname, endpoint.Address.Addr.String(), endpoint.Site)),
+		ID:            types.StringValue(fmt.Sprintf("%s/%s/%s/%s", endpoint.Domain, endpoint.Hostname, endpoint.Address.String(), endpoint.Site)),
 		Domain:        types.StringValue(endpoint.Domain),
 		Hostname:      types.StringValue(endpoint.Hostname),
-		Address:       types.StringValue(endpoint.Address.Addr.String()),
+		Address:       types.StringValue(endpoint.Address.String()),
 		Site:          types.StringValue(endpoint.Site),
 		ProxyProtocol: types.BoolValue(endpoint.ProxyProtocol),
 	}
@@ -283,10 +283,10 @@ func (r *ProxyEndpointResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	state.ID = types.StringValue(fmt.Sprintf("%s/%s/%s/%s", endpoint.Domain, endpoint.Hostname, endpoint.Address.Addr.String(), endpoint.Site))
+	state.ID = types.StringValue(fmt.Sprintf("%s/%s/%s/%s", endpoint.Domain, endpoint.Hostname, endpoint.Address.String(), endpoint.Site))
 	state.Domain = types.StringValue(endpoint.Domain)
 	state.Hostname = types.StringValue(endpoint.Hostname)
-	state.Address = types.StringValue(endpoint.Address.Addr.String())
+	state.Address = types.StringValue(endpoint.Address.String())
 	state.Site = types.StringValue(endpoint.Site)
 	state.ProxyProtocol = types.BoolValue(endpoint.ProxyProtocol)
 
@@ -390,10 +390,10 @@ func (r *ProxyEndpointResource) Update(ctx context.Context, req resource.UpdateR
 
 	endpoint := endpoints[0]
 	state = ProxyEndpointResourceModel{
-		ID:            types.StringValue(fmt.Sprintf("%s/%s/%s/%s", endpoint.Domain, endpoint.Hostname, endpoint.Address.Addr.String(), endpoint.Site)),
+		ID:            types.StringValue(fmt.Sprintf("%s/%s/%s/%s", endpoint.Domain, endpoint.Hostname, endpoint.Address.String(), endpoint.Site)),
 		Domain:        types.StringValue(endpoint.Domain),
 		Hostname:      types.StringValue(endpoint.Hostname),
-		Address:       types.StringValue(endpoint.Address.Addr.String()),
+		Address:       types.StringValue(endpoint.Address.String()),
 		Site:          types.StringValue(endpoint.Site),
 		ProxyProtocol: types.BoolValue(endpoint.ProxyProtocol),
 	}
