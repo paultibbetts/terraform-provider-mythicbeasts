@@ -30,6 +30,10 @@ func TestAccVPSPricingDataSource(t *testing.T) {
 						"data.mythicbeasts_vps_pricing.all",
 						tfjsonpath.New("disk"),
 						knownvalue.ObjectPartial(map[string]knownvalue.Check{
+							"hdd": knownvalue.ObjectPartial(map[string]knownvalue.Check{
+								"price":  knownvalue.NotNull(),
+								"extent": knownvalue.NotNull(),
+							}),
 							"ssd": knownvalue.ObjectPartial(map[string]knownvalue.Check{
 								"price":  knownvalue.NotNull(),
 								"extent": knownvalue.NotNull(),

@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/paultibbetts/mythicbeasts-client-go"
 )
@@ -81,6 +82,14 @@ func (d *piOperatingSystemsDataSource) Read(ctx context.Context, req datasource.
 	var state piOperatingSystemsDataSourceModel
 
 	model := config.Model
+	if model.IsNull() || model.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("model"),
+			"Missing required model",
+			"`model` must be set to read Pi operating systems.",
+		)
+		return
+	}
 	state.Model = model
 
 	piOperatingSystems, err := d.client.Pi().GetOperatingSystems(ctx, model.ValueInt64())

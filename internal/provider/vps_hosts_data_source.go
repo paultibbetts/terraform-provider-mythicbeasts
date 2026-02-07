@@ -61,7 +61,7 @@ func (d *VPSHostsDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"name":     schema.StringAttribute{Computed: true},
-						"cores":    schema.StringAttribute{Computed: true},
+						"cores":    schema.Int64Attribute{Computed: true},
 						"ram":      schema.Int64Attribute{Computed: true},
 						"free_ram": schema.Int64Attribute{Computed: true},
 						"disk": schema.SingleNestedAttribute{
@@ -97,7 +97,7 @@ func (d *VPSHostsDataSource) Read(ctx context.Context, req datasource.ReadReques
 	VPSHosts, err := d.client.VPS().GetHosts(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Mythic Beasts VPS zones",
+			"Unable to Read Mythic Beasts VPS hosts",
 			err.Error(),
 		)
 		return

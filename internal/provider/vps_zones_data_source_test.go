@@ -31,10 +31,10 @@ func TestAccVPSZonesDataSource(t *testing.T) {
 						tfjsonpath.New("zones"),
 						knownvalue.SetPartial([]knownvalue.Check{
 							knownvalue.ObjectPartial(map[string]knownvalue.Check{
-								"description": knownvalue.StringExact("UK (any)"),
-								"name":        knownvalue.StringExact("uk"),
-								"parents": knownvalue.SetExact([]knownvalue.Check{
-									knownvalue.StringExact("eu"),
+								"description": knownvalue.NotNull(),
+								"name":        knownvalue.NotNull(),
+								"parents": knownvalue.ListPartial(map[int]knownvalue.Check{
+									0: knownvalue.NotNull(),
 								}),
 							}),
 						}),

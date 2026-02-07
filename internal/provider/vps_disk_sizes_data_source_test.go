@@ -29,8 +29,8 @@ func TestAccVPSDiskSizesDataSource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.mythicbeasts_vps_disk_sizes.all",
 						tfjsonpath.New("hdd"),
-						knownvalue.SetPartial([]knownvalue.Check{
-							knownvalue.ObjectPartial(map[string]knownvalue.Check{
+						knownvalue.ListPartial(map[int]knownvalue.Check{
+							0: knownvalue.ObjectPartial(map[string]knownvalue.Check{
 								"size": knownvalue.NotNull(),
 							}),
 						}),
@@ -43,8 +43,8 @@ func TestAccVPSDiskSizesDataSource(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"data.mythicbeasts_vps_disk_sizes.all",
 						tfjsonpath.New("ssd"),
-						knownvalue.SetPartial([]knownvalue.Check{
-							knownvalue.ObjectPartial(map[string]knownvalue.Check{
+						knownvalue.ListPartial(map[int]knownvalue.Check{
+							0: knownvalue.ObjectPartial(map[string]knownvalue.Check{
 								"size": knownvalue.NotNull(),
 							}),
 						}),

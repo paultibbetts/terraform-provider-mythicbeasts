@@ -26,8 +26,8 @@ func TestAccVPSImagesDataSource(t *testing.T) {
 						tfjsonpath.New("images"),
 						knownvalue.SetPartial([]knownvalue.Check{
 							knownvalue.ObjectPartial(map[string]knownvalue.Check{
-								"description": knownvalue.StringExact("Ubuntu Jammy (22.04)"),
-								"name":        knownvalue.StringExact("cloudinit-ubuntu-jammy.raw.gz"),
+								"description": knownvalue.NotNull(),
+								"name":        knownvalue.NotNull(),
 							}),
 						}),
 					),

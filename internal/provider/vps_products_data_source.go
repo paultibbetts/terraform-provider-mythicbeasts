@@ -39,7 +39,13 @@ type VPSProductModel struct {
 	Code        types.String `tfsdk:"code"`
 	Family      types.String `tfsdk:"family"`
 	Period      types.String `tfsdk:"period"`
-	// TODO the rest
+	Specs       VPSProductSpecsModel `tfsdk:"specs"`
+}
+
+type VPSProductSpecsModel struct {
+	Cores     types.Int64 `tfsdk:"cores"`
+	RAM       types.Int64 `tfsdk:"ram"`
+	Bandwidth types.Int64 `tfsdk:"bandwidth"`
 }
 
 // Metadata returns the data source type name.
@@ -70,22 +76,20 @@ func (d *VPSProductsDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						"period": schema.StringAttribute{
 							Computed: true,
 						},
-						//"specs": schema.ListNestedAttribute{
-						//	Computed: true,
-						//	NestedObject: schema.NestedAttributeObject{
-						//		Attributes: map[string]schema.Attribute{
-						//			"cores": schema.Int64Attribute{
-						//				Computed: true,
-						//			},
-						//			"ram": schema.Int64Attribute{
-						//				Computed: true,
-						//			},
-						//			"bandwidth": schema.Int64Attribute{
-						//				Computed: true,
-						//			},
-						//		},
-						//	},
-						//},
+						"specs": schema.SingleNestedAttribute{
+							Computed: true,
+							Attributes: map[string]schema.Attribute{
+								"cores": schema.Int64Attribute{
+									Computed: true,
+								},
+								"ram": schema.Int64Attribute{
+									Computed: true,
+								},
+								"bandwidth": schema.Int64Attribute{
+									Computed: true,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -107,7 +111,7 @@ func (d *VPSProductsDataSource) Read(ctx context.Context, req datasource.ReadReq
 	VPSProducts, err := d.client.VPS().GetProducts(ctx, "")
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Mythic Beasts VPS disk sizes",
+			"Unable to Read Mythic Beasts VPS products",
 			err.Error(),
 		)
 		return
@@ -121,6 +125,11 @@ func (d *VPSProductsDataSource) Read(ctx context.Context, req datasource.ReadReq
 			Code:        types.StringValue(product.Code),
 			Family:      types.StringValue(product.Family),
 			Period:      types.StringValue(product.Period),
+			Specs: VPSProductSpecsModel{
+				Cores:     types.Int64Value(int64(product.Specs.Cores)),
+				RAM:       types.Int64Value(int64(product.Specs.RAM)),
+				Bandwidth: types.Int64Value(int64(product.Specs.Bandwidth)),
+			},
 		}
 
 		state.Products = append(state.Products, VPSProductState)

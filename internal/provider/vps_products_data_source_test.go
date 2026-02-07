@@ -36,6 +36,11 @@ func TestAccVPSProductsDataSource(t *testing.T) {
 								"family":      knownvalue.NotNull(),
 								"name":        knownvalue.NotNull(),
 								"period":      knownvalue.NotNull(),
+								"specs": knownvalue.ObjectPartial(map[string]knownvalue.Check{
+									"bandwidth": knownvalue.NotNull(),
+									"cores":     knownvalue.NotNull(),
+									"ram":       knownvalue.NotNull(),
+								}),
 							}),
 						}),
 					),
