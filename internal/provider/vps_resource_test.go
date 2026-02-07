@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-const identifier = "tfprovidertest14"
+const identifier = "tfprovidertest15"
 
 func TestAccVPSResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{

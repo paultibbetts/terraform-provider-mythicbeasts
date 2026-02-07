@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-const piIdentifier = "tfprovidertest6"
+const piIdentifier = "tfprovidertest7"
 const piSSHKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfx70ArvHPF+9U3GgKgNEAWkXSyZMun83sn9582Pl4e"
 const piSSHKeyUpdated = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB5Y6QFrfcJw0f0D8uG2D8btJQH8k8K6Pp9g8b0Xv2zL"
 
