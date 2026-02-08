@@ -20,7 +20,7 @@ The Mythic Beasts API requires the VPS to be powered off before changing `iso_im
 
 ```terraform
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.11.0"
 
   required_providers {
     mythicbeasts = {
