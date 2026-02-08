@@ -12,6 +12,7 @@ Terraform provider for the Mythic Beasts [Pi](https://www.mythic-beasts.com/supp
 - [Resources](#resources)
 - [Data sources](#data-sources)
 - [Development Status](#development-status)
+- [Versioning](#versioning)
 - [Building The Provider](#building-the-provider)
 - [Adding Dependencies](#adding-dependencies)
 - [Developing the Provider](#developing-the-provider)
@@ -125,6 +126,12 @@ This is a community-maintained provider and is not affiliated with or endorsed b
 It is provided on a best-effort basis. There is no formal support offering.
 
 Issues and pull requests are welcome.
+
+## Versioning
+
+This project is pre-1.0 and minor releases may include breaking changes.
+
+[Semantic versioning](https://semver.org/) is used for tags and a v1.0.0 will signal a stable API.
 
 ## Building The Provider
 
