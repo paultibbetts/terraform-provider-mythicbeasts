@@ -75,6 +75,14 @@ terraform {
   }
 }
 
+locals {
+    domain = "example.com"
+    subdomains = {
+        apex = "@"
+        www = "www"
+    }
+}
+
 resource "mythicbeasts_pi" "server" {
   identifier = "example"
   disk_size  = 10
@@ -82,17 +90,11 @@ resource "mythicbeasts_pi" "server" {
   memory     = 4096
 }
 
-resource "mythicbeasts_proxy_endpoint" "apex" {
-  domain         = "example.com"
-  hostname       = "@"
-  address        = mythicbeasts_pi.server.ip
-  site           = "all"
-  proxy_protocol = true
-}
+resource "mythicbeasts_proxy_endpoint" "subdomain" {
+  for_each       = local.subdomains
 
-resource "mythicbeasts_proxy_endpoint" "www" {
-  domain         = "example.com"
-  hostname       = "www"
+  domain         = local.domain
+  hostname       = each.value
   address        = mythicbeasts_pi.server.ip
   site           = "all"
   proxy_protocol = true
