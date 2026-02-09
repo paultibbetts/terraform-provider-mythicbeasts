@@ -1,0 +1,52 @@
+# Terraform Provider acceptance testing workflow.
+name: Acceptance Tests
+
+# Run acceptance tests for release candidates.
+on:
+  push:
+    tags:
+      - 'v*-rc*'
+
+permissions:
+  contents: read
+
+jobs:
+  testacc:
+    name: Terraform Provider Acceptance Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        terraform:
+          - '1.11.*'
+          # - '1.12.*'
+          # - '1.13.*'
+          # - '1.14.*'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: ${{ matrix.terraform }}
+          terraform_wrapper: false
+      - run: go mod download
+      - name: Check required acceptance test secrets
+        env:
+          MYTHICBEASTS_KEYID: ${{ secrets.MYTHICBEASTS_KEYID }}
+          MYTHICBEASTS_SECRET: ${{ secrets.MYTHICBEASTS_SECRET }}
+          MB_TEST_PROXY_DOMAIN: ${{ secrets.MB_TEST_PROXY_DOMAIN }}
+        run: |
+          test -n "$MYTHICBEASTS_KEYID" || (echo "Missing MYTHICBEASTS_KEYID secret"; exit 1)
+          test -n "$MYTHICBEASTS_SECRET" || (echo "Missing MYTHICBEASTS_SECRET secret"; exit 1)
+          test -n "$MB_TEST_PROXY_DOMAIN" || (echo "Missing MB_TEST_PROXY_DOMAIN secret"; exit 1)
+      - name: Run acceptance tests
+        env:
+          TF_ACC: "1"
+          MYTHICBEASTS_KEYID: ${{ secrets.MYTHICBEASTS_KEYID }}
+          MYTHICBEASTS_SECRET: ${{ secrets.MYTHICBEASTS_SECRET }}
+          MB_TEST_PROXY_DOMAIN: ${{ secrets.MB_TEST_PROXY_DOMAIN }}
+        run: make testacc
