@@ -20,7 +20,7 @@ Terraform provider for the Mythic Beasts [Pi](https://www.mythic-beasts.com/supp
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.11.0
-- [Go](https://golang.org/doc/install) >= 1.24
+- [Go](https://golang.org/doc/install) >= 1.25
 
 ## Authentication
 
