@@ -108,7 +108,7 @@ func (d *VPSPricingDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	VPSPricing, err := d.client.VPS().GetPricing(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Mythic Beasts VPS pricing",
+			"Unable to read Mythic Beasts VPS pricing",
 			err.Error(),
 		)
 		return

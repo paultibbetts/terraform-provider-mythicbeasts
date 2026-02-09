@@ -95,7 +95,7 @@ func (d *piOperatingSystemsDataSource) Read(ctx context.Context, req datasource.
 	piOperatingSystems, err := d.client.Pi().GetOperatingSystems(ctx, model.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("Unable to Read Mythic Beasts Pi Operating Systems for model: %d", config.Model.ValueInt64()),
+			fmt.Sprintf("Unable to read Mythic Beasts Pi operating systems for model: %d", config.Model.ValueInt64()),
 			err.Error(),
 		)
 		return

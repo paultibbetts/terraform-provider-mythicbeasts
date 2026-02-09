@@ -198,7 +198,7 @@ func (r *PiResource) Configure(_ context.Context, req resource.ConfigureRequest,
 
 	if !ok {
 		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
+			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *mythicbeasts.Client, got: %T. Pi report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -344,8 +344,8 @@ func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 	server, err := r.client.Pi().Get(ctx, state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error reading Mythic Beasts Pi ",
-			"Could not read Pi  "+state.Identifier.String()+": "+err.Error(),
+			"Error reading Mythic Beasts Pi",
+			"Could not read Pi "+state.Identifier.String()+": "+err.Error(),
 		)
 		return
 	}
@@ -353,8 +353,8 @@ func (r *PiResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 	diskSize, err := strconv.ParseFloat(server.DiskSize, 64)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error creating Pi server",
-			"Could not create Pi server, unexpected error converting disk size: "+err.Error(),
+			"Error reading Mythic Beasts Pi",
+			"Could not read Pi, unexpected error converting disk size: "+err.Error(),
 		)
 		return
 	}
@@ -472,8 +472,8 @@ func (r *PiResource) Delete(ctx context.Context, req resource.DeleteRequest, res
 	err := r.client.Pi().Delete(ctx, state.Identifier.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error deleting Pi ",
-			"Could not delete Pi , unexpected error: "+err.Error(),
+			"Error deleting Pi",
+			"Could not delete Pi, unexpected error: "+err.Error(),
 		)
 		return
 	}

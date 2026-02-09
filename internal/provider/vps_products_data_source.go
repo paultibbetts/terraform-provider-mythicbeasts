@@ -111,7 +111,7 @@ func (d *VPSProductsDataSource) Read(ctx context.Context, req datasource.ReadReq
 	VPSProducts, err := d.client.VPS().GetProducts(ctx, "")
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Mythic Beasts VPS products",
+			"Unable to read Mythic Beasts VPS products",
 			err.Error(),
 		)
 		return

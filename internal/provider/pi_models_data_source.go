@@ -106,7 +106,7 @@ func (d *piModelsDataSource) Read(ctx context.Context, req datasource.ReadReques
 	piModels, err := d.client.Pi().ListModels(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Mythic Beasts Pi models",
+			"Unable to read Mythic Beasts Pi models",
 			err.Error(),
 		)
 		return

@@ -97,7 +97,7 @@ func (d *VPSHostsDataSource) Read(ctx context.Context, req datasource.ReadReques
 	VPSHosts, err := d.client.VPS().GetHosts(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unable to Read Mythic Beasts VPS hosts",
+			"Unable to read Mythic Beasts VPS hosts",
 			err.Error(),
 		)
 		return

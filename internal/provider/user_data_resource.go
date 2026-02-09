@@ -106,7 +106,7 @@ func (r *UserDataResource) Configure(_ context.Context, req resource.ConfigureRe
 
 	if !ok {
 		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
+			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *mythicbeasts.Client, got: %T. UserData report this issue to the provider developers.", req.ProviderData),
 		)
 
