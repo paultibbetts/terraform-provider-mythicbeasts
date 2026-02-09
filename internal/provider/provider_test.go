@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -18,7 +19,17 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 }
 
 func testAccPreCheck(t *testing.T) {
-	// You can add code here to run prior to any test case execution, for example assertions
-	// about the appropriate environment variables being set are common to see in a pre-check
-	// function.
+	t.Helper()
+
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("acceptance tests skipped unless TF_ACC is set")
+	}
+
+	if os.Getenv("MYTHICBEASTS_KEYID") == "" {
+		t.Fatal("MYTHICBEASTS_KEYID must be set for acceptance tests")
+	}
+
+	if os.Getenv("MYTHICBEASTS_SECRET") == "" {
+		t.Fatal("MYTHICBEASTS_SECRET must be set for acceptance tests")
+	}
 }
