@@ -55,6 +55,8 @@ func (r *UserDataResource) Metadata(_ context.Context, req resource.MetadataRequ
 // Schema defines the schema for the resource.
 func (r *UserDataResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Manages User Data.\n\n" +
+			"Predefined cloud-init user data snippets executed during initial [`mythicbeasts_vps` resource](/vps) creation.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				Computed:            true,

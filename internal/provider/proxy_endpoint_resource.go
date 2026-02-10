@@ -57,6 +57,8 @@ func (r *ProxyEndpointResource) Metadata(_ context.Context, req resource.Metadat
 // Schema defines the schema for the resource.
 func (r *ProxyEndpointResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Manages Endpoints for the IPv4 to IPv6 proxy.\n\n" +
+			"Can be used to make [`mythicbeasts_pi` resources](../resources/pi) available via IPv4.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:            true,

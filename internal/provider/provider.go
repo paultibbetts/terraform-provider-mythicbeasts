@@ -52,6 +52,10 @@ func (p *mythicbeastsProvider) Metadata(_ context.Context, _ provider.MetadataRe
 // Schema defines the provider-level schema for configuration data.
 func (p *mythicbeastsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Manage Mythic Beasts resources with Terraform.\n\n" +
+			"## Authentication\n\n" +
+			"The Mythic Beasts APIs require an [API key](https://www.mythic-beasts.com/customer/api-users) for authentication.\n\n" +
+			"When creating the key you must add permissions to work with the APIs you wish to use.",
 		Attributes: map[string]schema.Attribute{
 			"keyid": schema.StringAttribute{
 				Optional: true,
