@@ -4,6 +4,7 @@ Terraform provider for the Mythic Beasts [Pi](https://www.mythic-beasts.com/supp
 
 ## Table of Contents
 
+- [Documentation](#documentation)
 - [Requirements](#requirements)
 - [Authentication](#authentication)
 - [Proxy endpoint domain management](#proxy-endpoint-domain-management)
@@ -16,6 +17,10 @@ Terraform provider for the Mythic Beasts [Pi](https://www.mythic-beasts.com/supp
 - [Building The Provider](#building-the-provider)
 - [Adding Dependencies](#adding-dependencies)
 - [Developing the Provider](#developing-the-provider)
+
+## Documentation
+
+Documentation can be found at [https://registry.terraform.io/providers/paultibbetts/mythicbeasts/latest/docs](https://registry.terraform.io/providers/paultibbetts/mythicbeasts/latest/docs).
 
 ## Requirements
 
