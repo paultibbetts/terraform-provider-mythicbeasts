@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_vps_zones Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  Returns available VPS zones (datacentres) and hierarchy information. Use zone names from this data source for create_in_zone on mythicbeasts_vps.
+  Returns available VPS zones (datacentres) and hierarchy information. Use zone names from this data source for create_in_zone on mythicbeasts_vps resource ../resources/vps.
 ---
 
 # mythicbeasts_vps_zones (Data Source)
 
-Returns available VPS zones (datacentres) and hierarchy information. Use zone names from this data source for `create_in_zone` on `mythicbeasts_vps`.
+Returns available VPS zones (datacentres) and hierarchy information. Use zone names from this data source for `create_in_zone` on [`mythicbeasts_vps` resource](../resources/vps).
 
 ## Example Usage
 

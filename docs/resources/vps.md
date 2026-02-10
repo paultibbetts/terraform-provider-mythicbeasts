@@ -48,11 +48,11 @@ resource "mythicbeasts_vps" "example" {
 
 > **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
-- `disk_size` (Number, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Disk size, in MB; see the `mythicbeasts_vps_disk_sizes` data source for valid values
+- `disk_size` (Number, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Disk size, in MB; see the [`mythicbeasts_vps_disk_sizes` data source](../data-sources/vps_disk_sizes) for valid values
 - `identifier` (String) A unique identifier for the server. This will form part of the hostname for the server, and must consist only of lower-case letters and digits and be at most 20 characters long
-- `image` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Operating system image name; see the `mythicbeasts_vps_images` data source for valid values
+- `image` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Operating system image name; see the [`mythicbeasts_vps_images` data source](../data-sources/vps_images) for valid values
 - `name` (String)
-- `product` (String) Virtual server product code; see the `mythicbeasts_vps_products` data source for valid values
+- `product` (String) Virtual server product code; see the [`mythicbeasts_vps_products` data source](../data-sources/vps_products) for valid values
 - `ssh_keys` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Public SSH key(s) to be added to /root/.ssh/authorized_keys on server
 
 ### Optional
@@ -69,7 +69,7 @@ Possible values:
 Default: `performance`
 
 Changing this setting via the API requires the VPS to be powered off.
-- `create_in_zone` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Zone (datacentre) code; see the `mythicbeasts_vps_zones` data source for valid values
+- `create_in_zone` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Zone (datacentre) code; see the [`mythicbeasts_vps_zones` data source](../data-sources/vps_zones) for valid values
 - `disk_bus` (String) (Optional) Virtual disk bus adapter type
 Possible values:
 -`virtio`
@@ -79,10 +79,10 @@ Possible values:
 Default: `virtio`
 
 Changing this setting via the API requires the VPS to be powered off.
-- `host_server` (String) Name of private cloud host server to provision on; see the `mythicbeasts_hosts` data source for valid values
+- `host_server` (String) Name of private cloud host server to provision on; see the [`mythicbeasts_vps_hosts` data source](../data-sources/vps_hosts) for valid values
 - `hostname` (String) Hostname the new server should be installed with
 Default: `{identifier}.vs.mythic-beasts.com`
-- `ipv4_enabled` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether or not to allocate an IPv4 address for this server; an IPv6 address will always be allocated; IPv4 is a chargeable option; see the `mythicbeasts_vps_pricing` data source for the price
+- `ipv4_enabled` (Boolean, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Whether or not to allocate an IPv4 address for this server; an IPv6 address will always be allocated; IPv4 is a chargeable option; see the [`mythicbeasts_vps_pricing` data source](../data-sources/vps_pricing) for the price
 - `iso_image` (String) ISO image currently in virtual CD drive. Set to `null` to remove.
 
 Changing this setting via the API requires the VPS to be powered off.
@@ -105,7 +105,7 @@ Default: `false`
 Default: `true`
 
 Changing this setting via the API requires the VPS to be powered off.
-- `user_data` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Stored user data ID or name; see the `mythicbeasts_user_data` resource for valid values
+- `user_data` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Stored user data ID or name; see the [`mythicbeasts_user_data` resource](../resources/user_data) for valid values
 - `user_data_string` (String, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) User data (as a literal string)
 - `vnc` (Attributes) VNC settings (see [below for nested schema](#nestedatt--vnc))
 

@@ -145,7 +145,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 						"must not be empty or contain whitespace",
 					),
 				},
-				MarkdownDescription: "Virtual server product code; see the `mythicbeasts_vps_products` data source for valid values",
+				MarkdownDescription: "Virtual server product code; see the [`mythicbeasts_vps_products` data source](../data-sources/vps_products) for valid values",
 			},
 			"name": schema.StringAttribute{
 				Required: true,
@@ -174,12 +174,12 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 			"ipv4_enabled": schema.BoolAttribute{
 				Optional:            true,
 				WriteOnly:           true,
-				MarkdownDescription: "Whether or not to allocate an IPv4 address for this server; an IPv6 address will always be allocated; IPv4 is a chargeable option; see the `mythicbeasts_vps_pricing` data source for the price",
+				MarkdownDescription: "Whether or not to allocate an IPv4 address for this server; an IPv6 address will always be allocated; IPv4 is a chargeable option; see the [`mythicbeasts_vps_pricing` data source](../data-sources/vps_pricing) for the price",
 			},
 			"disk_size": schema.Int64Attribute{
 				Required:            true,
 				WriteOnly:           true,
-				MarkdownDescription: "Disk size, in MB; see the `mythicbeasts_vps_disk_sizes` data source for valid values",
+				MarkdownDescription: "Disk size, in MB; see the [`mythicbeasts_vps_disk_sizes` data source](../data-sources/vps_disk_sizes) for valid values",
 				Validators: []validator.Int64{
 					int64validator.AtLeast(1),
 				},
@@ -187,12 +187,12 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 			"image": schema.StringAttribute{
 				Required:            true,
 				WriteOnly:           true,
-				MarkdownDescription: "Operating system image name; see the `mythicbeasts_vps_images` data source for valid values",
+				MarkdownDescription: "Operating system image name; see the [`mythicbeasts_vps_images` data source](../data-sources/vps_images) for valid values",
 			},
 			"user_data": schema.StringAttribute{
 				Optional:            true,
 				WriteOnly:           true,
-				MarkdownDescription: "Stored user data ID or name; see the `mythicbeasts_user_data` resource for valid values",
+				MarkdownDescription: "Stored user data ID or name; see the [`mythicbeasts_user_data` resource](../resources/user_data) for valid values",
 			},
 			"user_data_string": schema.StringAttribute{
 				Optional:            true,
@@ -207,7 +207,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 			"create_in_zone": schema.StringAttribute{
 				Optional:            true,
 				WriteOnly:           true,
-				MarkdownDescription: "Zone (datacentre) code; see the `mythicbeasts_vps_zones` data source for valid values",
+				MarkdownDescription: "Zone (datacentre) code; see the [`mythicbeasts_vps_zones` data source](../data-sources/vps_zones) for valid values",
 			},
 			"host_server": schema.StringAttribute{
 				Computed: true,
@@ -216,7 +216,7 @@ func (r *VPSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 					stringplanmodifier.UseStateForUnknown(),
 					stringplanmodifier.RequiresReplace(),
 				},
-				MarkdownDescription: "Name of private cloud host server to provision on; see the `mythicbeasts_hosts` data source for valid values",
+				MarkdownDescription: "Name of private cloud host server to provision on; see the [`mythicbeasts_vps_hosts` data source](../data-sources/vps_hosts) for valid values",
 			},
 			"cpu_mode": schema.StringAttribute{
 				Computed: true,

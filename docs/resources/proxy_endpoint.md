@@ -3,15 +3,15 @@
 page_title: "mythicbeasts_proxy_endpoint Resource - mythicbeasts"
 subcategory: ""
 description: |-
-  Manages Endpoints for the IPv4 to IPv6 proxy.
-  Can be used to make mythicbeasts_pi resources ../resources/pi available via IPv4.
+  Manages endpoints for the IPv4 to IPv6 proxy.
+  Can be used to make a mythicbeasts_pi resource ../resources/pi available via IPv4.
 ---
 
 # mythicbeasts_proxy_endpoint (Resource)
 
-Manages Endpoints for the IPv4 to IPv6 proxy.
+Manages endpoints for the IPv4 to IPv6 proxy.
 
-Can be used to make [`mythicbeasts_pi` resources](../resources/pi) available via IPv4.
+Can be used to make a [`mythicbeasts_pi` resource](../resources/pi) available via IPv4.
 
 ## Example Usage
 

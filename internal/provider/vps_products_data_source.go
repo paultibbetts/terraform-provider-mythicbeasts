@@ -56,7 +56,7 @@ func (d *VPSProductsDataSource) Metadata(_ context.Context, req datasource.Metad
 // Schema defines the schema for the data source.
 func (d *VPSProductsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Returns available VPS products and their base specifications. Use product codes from this data source when configuring `mythicbeasts_vps`.",
+		MarkdownDescription: "Returns available VPS products and their base specifications. Use product codes from this data source when configuring [`mythicbeasts_vps` resource](../resources/vps).",
 		Attributes: map[string]schema.Attribute{
 			"products": schema.SetNestedAttribute{
 				Computed: true,

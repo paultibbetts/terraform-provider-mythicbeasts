@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_vps_images Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  Returns available VPS operating system images. Use image names from this data source when creating mythicbeasts_vps.
+  Returns available VPS operating system images. Use image names from this data source when creating mythicbeasts_vps resource ../resources/vps.
 ---
 
 # mythicbeasts_vps_images (Data Source)
 
-Returns available VPS operating system images. Use image names from this data source when creating `mythicbeasts_vps`.
+Returns available VPS operating system images. Use image names from this data source when creating [`mythicbeasts_vps` resource](../resources/vps).
 
 ## Example Usage
 

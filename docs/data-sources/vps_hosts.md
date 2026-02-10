@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_vps_hosts Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  Returns private cloud host capacity and availability information. Use this data source to choose host_server for mythicbeasts_vps deployments.
+  Returns private cloud host capacity and availability information. Use this data source to choose host_server for mythicbeasts_vps resource ../resources/vps deployments.
 ---
 
 # mythicbeasts_vps_hosts (Data Source)
 
-Returns private cloud host capacity and availability information. Use this data source to choose `host_server` for `mythicbeasts_vps` deployments.
+Returns private cloud host capacity and availability information. Use this data source to choose `host_server` for [`mythicbeasts_vps` resource](../resources/vps) deployments.
 
 ## Example Usage
 

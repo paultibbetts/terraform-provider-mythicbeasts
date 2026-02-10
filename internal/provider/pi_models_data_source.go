@@ -52,7 +52,7 @@ func (d *piModelsDataSource) Metadata(_ context.Context, req datasource.Metadata
 // Schema defines the schema for the data source.
 func (d *piModelsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Returns available Raspberry Pi models and hardware specifications. Use optional filters to narrow results by `model` number, `memory`, `nic_speed`, or `cpu_speed`.",
+		MarkdownDescription: "Returns available Raspberry Pi models and hardware specifications. Use optional filters to narrow results by `model` number, `memory`, `nic_speed`, or `cpu_speed` when planning a [`mythicbeasts_pi` resource](../resources/pi).",
 		Attributes: map[string]schema.Attribute{
 			"model": schema.Int64Attribute{
 				Optional:    true,

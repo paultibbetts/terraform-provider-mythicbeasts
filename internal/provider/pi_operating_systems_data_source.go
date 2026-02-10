@@ -48,7 +48,7 @@ func (d *piOperatingSystemsDataSource) Metadata(_ context.Context, req datasourc
 // Schema defines the schema for the data source.
 func (d *piOperatingSystemsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Returns operating system images available for a specific Raspberry Pi model. Use this data source to select a valid `os_image` for `mythicbeasts_pi`.",
+		MarkdownDescription: "Returns operating system images available for a specific Raspberry Pi model. Use this data source to select a valid `os_image` for [`mythicbeasts_pi` resource](../resources/pi).",
 		Attributes: map[string]schema.Attribute{
 			"model": schema.Int64Attribute{
 				Required:    true,
