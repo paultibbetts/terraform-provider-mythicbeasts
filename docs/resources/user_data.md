@@ -4,14 +4,14 @@ page_title: "mythicbeasts_user_data Resource - mythicbeasts"
 subcategory: ""
 description: |-
   Manages User Data.
-  Predefined cloud-init user data snippets executed during initial mythicbeasts_vps resource creation.
+  Predefined cloud-init user data snippets executed during initial mythicbeasts_vps resource ../resources/vps creation.
 ---
 
 # mythicbeasts_user_data (Resource)
 
 Manages User Data.
 
-Predefined cloud-init user data snippets executed during initial [`mythicbeasts_vps` resource](/vps) creation.
+Predefined cloud-init user data snippets executed during initial [`mythicbeasts_vps` resource](../resources/vps) creation.
 
 ## Example Usage
 
