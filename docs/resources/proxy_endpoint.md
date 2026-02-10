@@ -3,12 +3,15 @@
 page_title: "mythicbeasts_proxy_endpoint Resource - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Manages Endpoints for the IPv4 to IPv6 proxy.
+  Can be used to make mythicbeasts_pi resources ../resources/pi available via IPv4.
 ---
 
 # mythicbeasts_proxy_endpoint (Resource)
 
+Manages Endpoints for the IPv4 to IPv6 proxy.
 
+Can be used to make [`mythicbeasts_pi` resources](../resources/pi) available via IPv4.
 
 ## Example Usage
 
@@ -59,3 +62,29 @@ resource "mythicbeasts_proxy_endpoint" "example" {
 ### Read-Only
 
 - `id` (String) Composite identifier for the proxy endpoint (domain/hostname/address/site).
+
+## Import
+
+Import is supported using the following syntax:
+
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = mythicbeasts_proxy_endpoint.example
+  id = "example.com/example/2001:db8::1/all"
+}
+
+resource "mythicbeasts_proxy_endpoint" "example" {
+  domain   = "example.com"
+  hostname = "example"
+  address  = "2001:db8::1"
+  site     = "all"
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+terraform import mythicbeasts_proxy_endpoint.example 'example.com/example/2001:db8::1/all'
+```

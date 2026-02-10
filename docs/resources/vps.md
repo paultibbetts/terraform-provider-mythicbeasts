@@ -168,3 +168,32 @@ Read-Only:
 
 - `code` (String) Zone Code
 - `name` (String) Zone Name
+
+## Import
+
+Import is supported using the following syntax:
+
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = mythicbeasts_vps.example
+  id = "example"
+}
+
+resource "mythicbeasts_vps" "example" {
+  identifier   = "example"
+  name         = "example"
+  disk_size    = 10240
+  image        = "cloudinit-ubuntu-noble.raw.gz"
+  product      = "VPSX4"
+  ssh_keys     = "ssh-ed25519 ..."
+  ipv4_enabled = false
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+terraform import mythicbeasts_vps.example example
+```

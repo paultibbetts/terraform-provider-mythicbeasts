@@ -3,12 +3,21 @@
 page_title: "mythicbeasts_pi Resource - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Manages a Raspberry Pi.
+  ~> Note: This is a service aimed at hobbyists, and shouldn't be used for nuclear power station command and control systems.
+  IPv6
+  The Pis are on an IPv6-only network. See mythicbeasts_proxy_endpoint resource ../resources/proxy_endpoint to set up an endpoint for the IPv4 to IPv6 proxy.
 ---
 
 # mythicbeasts_pi (Resource)
 
+Manages a Raspberry Pi.
 
+~> **Note:** This is a service aimed at hobbyists, and shouldn't be used for nuclear power station command and control systems.
+
+## IPv6
+
+The Pis are on an IPv6-only network. See [`mythicbeasts_proxy_endpoint` resource](../resources/proxy_endpoint) to set up an endpoint for the IPv4 to IPv6 proxy.
 
 ## Example Usage
 
@@ -59,3 +68,26 @@ resource "mythicbeasts_pi" "example" {
 - `location` (String) Data centre in which server is located
 - `nic_speed` (Number) NIC speed in Mbps. Will default to the lowest available spec matching all of `model`, `memory` and `cpu_speed`.
 - `ssh_port` (Number) Port for accessing SSH via IPv4 relay. Server is accessible on `ssh.{identifier}.hostedpi.com`.
+
+## Import
+
+Import is supported using the following syntax:
+
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = mythicbeasts_pi.example
+  id = "example"
+}
+
+resource "mythicbeasts_pi" "example" {
+  identifier = "example"
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+terraform import mythicbeasts_pi.example example
+```

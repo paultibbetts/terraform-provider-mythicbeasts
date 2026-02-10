@@ -3,12 +3,15 @@
 page_title: "mythicbeasts_user_data Resource - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Manages User Data.
+  Predefined cloud-init user data snippets executed during initial mythicbeasts_vps resource creation.
 ---
 
 # mythicbeasts_user_data (Resource)
 
+Manages User Data.
 
+Predefined cloud-init user data snippets executed during initial [`mythicbeasts_vps` resource](/vps) creation.
 
 ## Example Usage
 
@@ -41,3 +44,27 @@ resource "mythicbeasts_user_data" "example" {
 
 - `id` (Number) User data identifier
 - `size` (Number) User data size (in bytes)
+
+## Import
+
+Import is supported using the following syntax:
+
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = mythicbeasts_user_data.example
+  id = "123"
+}
+
+resource "mythicbeasts_user_data" "example" {
+  name = "example-apache"
+  data = "#cloud-config\n\npackages:\n  - apache2\n\n"
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+terraform import mythicbeasts_user_data.example 123
+```
