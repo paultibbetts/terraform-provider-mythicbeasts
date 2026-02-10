@@ -52,10 +52,23 @@ func (p *mythicbeastsProvider) Metadata(_ context.Context, _ provider.MetadataRe
 // Schema defines the provider-level schema for configuration data.
 func (p *mythicbeastsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Manage Mythic Beasts resources with Terraform.\n\n" +
-			"## Authentication\n\n" +
-			"The Mythic Beasts APIs require an [API key](https://www.mythic-beasts.com/customer/api-users) for authentication.\n\n" +
-			"When creating the key you must add permissions to work with the APIs you wish to use.",
+		MarkdownDescription: `Manage Mythic Beasts resources with Terraform.
+
+## Authentication
+
+The Mythic Beasts APIs require an [API key](https://www.mythic-beasts.com/customer/api-users) for authentication.
+
+When creating the key you must add permissions to work with the APIs you wish to use, such as:
+
+- "Virtual Server Provisioning" for VPS
+- "Raspberry Pi provisioning" for Pis
+- "IPv4 to IPv6 Proxy API" for Proxy Endpoints
+
+## Proxy Endpoint Domain Management
+
+The domain used for proxy endpoints must be registered with the Mythic Beasts control panel.
+
+This can be done by registering the domain using their [domain management](https://www.mythic-beasts.com/customer/domains) or by [adding it as a 3rd party domain](https://www.mythic-beasts.com/customer/3rdpartydomain).`,
 		Attributes: map[string]schema.Attribute{
 			"keyid": schema.StringAttribute{
 				Optional: true,
