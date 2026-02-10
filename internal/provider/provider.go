@@ -99,7 +99,7 @@ func (p *mythicbeastsProvider) Configure(ctx context.Context, req provider.Confi
 			path.Root("keyid"),
 			"Unknown Mythic Beasts API Key",
 			"The provider cannot create the Mythic Beasts API client as there is an unknown configuration value for the Mythic Beasts API key. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the MYTHICBEASTS_KEY environment variable.",
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the MYTHICBEASTS_KEYID environment variable.",
 		)
 	}
 
@@ -148,7 +148,7 @@ func (p *mythicbeastsProvider) Configure(ctx context.Context, req provider.Confi
 			path.Root("secret"),
 			"Missing Mythic Beasts API secret",
 			"The provider cannot create the Mythic Beasts API client as there is a missing or empty value for the Mythic Beasts API secret. "+
-				"Set the secret value in the configuration or use the MYTHICBEATS_SECRET environment variable. "+
+				"Set the secret value in the configuration or use the MYTHICBEASTS_SECRET environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
 	}
