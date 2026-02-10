@@ -70,7 +70,7 @@ func (r *PiResource) Metadata(_ context.Context, req resource.MetadataRequest, r
 func (r *PiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Manages a Raspberry Pi.\n\n" +
-			"> This is a service aimed at hobbyists, and shouldn't be used for nuclear power station command and control systems.\n\n" +
+			"~> **Note:** This is a service aimed at hobbyists, and shouldn't be used for nuclear power station command and control systems.\n\n" +
 			"## IPv6\n\n" +
 			"The Pis are on an IPv6-only network. See [`mythicbeasts_proxy_endpoint` resource](../resources/proxy_endpoint) to set up an endpoint for the IPv4 to IPv6 proxy.",
 		Attributes: map[string]schema.Attribute{
