@@ -55,6 +55,7 @@ func (d *VPSHostsDataSource) Metadata(_ context.Context, req datasource.Metadata
 // Schema defines the schema for the data source.
 func (d *VPSHostsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Returns private cloud host capacity and availability information. Use this data source to choose `host_server` for `mythicbeasts_vps` deployments.",
 		Attributes: map[string]schema.Attribute{
 			"hosts": schema.SetNestedAttribute{
 				Computed: true,

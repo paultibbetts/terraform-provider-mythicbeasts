@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_pi_operating_systems Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Returns operating system images available for a specific Raspberry Pi model. Use this data source to select a valid os_image for mythicbeasts_pi.
 ---
 
 # mythicbeasts_pi_operating_systems (Data Source)
 
-
+Returns operating system images available for a specific Raspberry Pi model. Use this data source to select a valid `os_image` for `mythicbeasts_pi`.
 
 ## Example Usage
 

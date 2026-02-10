@@ -52,6 +52,7 @@ func (d *VPSPricingDataSource) Metadata(_ context.Context, req datasource.Metada
 // Schema defines the schema for the data source.
 func (d *VPSPricingDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Returns VPS pricing for disk, IPv4, and product codes. Use this to estimate monthly costs before creating or updating `mythicbeasts_vps`.",
 		Attributes: map[string]schema.Attribute{
 			"disk": schema.SingleNestedAttribute{
 				Computed: true,

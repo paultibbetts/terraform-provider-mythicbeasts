@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_vps_products Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Returns available VPS products and their base specifications. Use product codes from this data source when configuring mythicbeasts_vps.
 ---
 
 # mythicbeasts_vps_products (Data Source)
 
-
+Returns available VPS products and their base specifications. Use product codes from this data source when configuring `mythicbeasts_vps`.
 
 ## Example Usage
 

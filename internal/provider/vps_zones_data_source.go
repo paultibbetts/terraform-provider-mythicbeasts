@@ -48,6 +48,7 @@ func (d *VPSZonesDataSource) Metadata(_ context.Context, req datasource.Metadata
 // Schema defines the schema for the data source.
 func (d *VPSZonesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Returns available VPS zones (datacentres) and hierarchy information. Use zone names from this data source for `create_in_zone` on `mythicbeasts_vps`.",
 		Attributes: map[string]schema.Attribute{
 			"zones": schema.SetNestedAttribute{
 				Computed: true,

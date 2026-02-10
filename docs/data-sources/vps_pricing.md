@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_vps_pricing Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Returns VPS pricing for disk, IPv4, and product codes. Use this to estimate monthly costs before creating or updating mythicbeasts_vps.
 ---
 
 # mythicbeasts_vps_pricing (Data Source)
 
-
+Returns VPS pricing for disk, IPv4, and product codes. Use this to estimate monthly costs before creating or updating `mythicbeasts_vps`.
 
 ## Example Usage
 

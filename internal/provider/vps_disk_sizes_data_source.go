@@ -46,6 +46,7 @@ func (d *VPSDiskSizesDataSource) Metadata(_ context.Context, req datasource.Meta
 // Schema defines the schema for the data source.
 func (d *VPSDiskSizesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Returns valid VPS disk size options for HDD and SSD-backed storage. Use these values when setting `disk_size` on `mythicbeasts_vps`.",
 		Attributes: map[string]schema.Attribute{
 			"hdd": schema.ListNestedAttribute{
 				Computed: true,

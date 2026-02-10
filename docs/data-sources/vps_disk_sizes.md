@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_vps_disk_sizes Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Returns valid VPS disk size options for HDD and SSD-backed storage. Use these values when setting disk_size on mythicbeasts_vps.
 ---
 
 # mythicbeasts_vps_disk_sizes (Data Source)
 
-
+Returns valid VPS disk size options for HDD and SSD-backed storage. Use these values when setting `disk_size` on `mythicbeasts_vps`.
 
 ## Example Usage
 

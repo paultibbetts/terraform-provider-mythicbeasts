@@ -3,12 +3,12 @@
 page_title: "mythicbeasts_pi_models Data Source - mythicbeasts"
 subcategory: ""
 description: |-
-  
+  Returns available Raspberry Pi models and hardware specifications. Use optional filters to narrow results by model number, memory, nic_speed, or cpu_speed.
 ---
 
 # mythicbeasts_pi_models (Data Source)
 
-
+Returns available Raspberry Pi models and hardware specifications. Use optional filters to narrow results by `model` number, `memory`, `nic_speed`, or `cpu_speed`.
 
 ## Example Usage
 

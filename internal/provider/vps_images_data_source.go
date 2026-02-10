@@ -46,6 +46,7 @@ func (d *VPSImagesDataSource) Metadata(_ context.Context, req datasource.Metadat
 // Schema defines the schema for the data source.
 func (d *VPSImagesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Returns available VPS operating system images. Use image names from this data source when creating `mythicbeasts_vps`.",
 		Attributes: map[string]schema.Attribute{
 			"images": schema.SetNestedAttribute{
 				Computed: true,
