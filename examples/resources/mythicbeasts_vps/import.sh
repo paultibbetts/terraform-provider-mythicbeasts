@@ -1,0 +1,1 @@
+terraform import mythicbeasts_vps.example example
